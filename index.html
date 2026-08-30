@@ -1,496 +1,104 @@
-/* =====================================================================
-   PARTY / EUROPARTY COLOUR SYSTEM
-   Adapted from the Political Party Database Codebook (Poguntke et al., 2025)
-   ===================================================================== */
-Chart.defaults.font.family = "'Advent Pro', sans-serif";
-Chart.defaults.font.weight = '600';
+/* ============================================================
+   Make sure these two blocks are the ONLY places on the page
+   that call new Chart(...) on '#trendChart' and '#projTrendChart'.
+   If a second copy of either block still exists further down
+   the file (or in a leftover <script> tag), delete it — Chart.js
+   will silently keep whichever instance grabbed the canvas first,
+   which is exactly the "still categorical / still connected"
+   symptom you're seeing.
+   ============================================================ */
 
-const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-function parseDate(str){
-  const [day, mon, year] = str.split(' ');
-  return new Date(parseInt(year,10), MONTHS[mon], parseInt(day,10)).getTime();
-}
-function fmtDate(ms){
-  const d = new Date(ms);
-  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();
-}
+/* ---------- POLL TREND CHART (dots only, true date-linear x-axis) ---------- */
+(function(){
+  const existing = Chart.getChart('trendChart');
+  if (existing) existing.destroy(); // guard against a stale instance on the same canvas
 
-const PARTIES = {
-  CDU:    {name:'CDU (EPP)',    full:'Christlich Demokratische Union',        family:'Christian Democrats',  euro:'EPP',  color:'#3399FF', dark:false},
-  AfD:    {name:'AfD (ESN)',    full:'Alternative für Deutschland',           family:'Far-right / populist',  euro:'ESN',  color:'#70463A', dark:false},
-  LINKE:  {name:'Linke (LEFT)', full:'Die Linke',                             family:'Left-wing',             euro:'LEFT', color:'#990000', dark:false},
-  SPD:    {name:'SPD (S&D)',    full:'Sozialdemokratische Partei Deutschlands',family:'Social Democrats',     euro:'S&D',  color:'#FF0000', dark:false},
-  GRUENE: {name:'Grüne (Greens/EFA)', full:'Bündnis 90/Die Grünen',           family:'Greens',                euro:'Greens/EFA', color:'#009900', dark:false},
-  FDP:    {name:'FDP (RE)',     full:'Freie Demokratische Partei',            family:'Liberal',               euro:'RE',   color:'#FFD700', dark:true},
-  BSW:    {name:'BSW (NI)',     full:'Bündnis Sahra Wagenknecht',             family:'Left-conservative',     euro:'NI',   color:'#9aa0a6', dark:false},
-  FW:     {name:'FW (RE)',      full:'Freie Wähler',                          family:'Centrist',              euro:'RE',   color:'#fa8c00', dark:false},
-  BASIS:  {name:'dieBasis', full:'Basisdemokratische Partei',           family:'Independent',           euro:'None', color:'#b9b6ab', dark:false},
-  TSP:    {name:'Tierschutzpartei', full:'Partei Mensch Klima Tierschutz', family:'Animal rights',       euro:'Animal Politics', color:'#009076', dark:false},
-  GARTEN: {name:'Gartenpartei', full:'Gartenpartei',                    family:'Single-issue',          euro:'None', color:'#8fae4c', dark:false},
-  PARTEI: {name:'Die PARTEI', full:'Die PARTEI',                        family:'Satirical',             euro:'None', color:'#7a6c5d', dark:false},
-  TSA:    {name:'Tierschutzallianz', full:'Allianz für Menschenrechte, Tier- und Naturschutz', family:'Animal rights', euro:'Animal Politics', color:'#00a68c', dark:false},
-  PDF:    {name:'PdF',    full:'Partei des Fortschritts',               family:'Digital democracy',     euro:'None', color:'#a0a4ab', dark:false},
-  VOLT:   {name:'Volt',   full:'Volt Deutschland',                      family:'Eurofederalist',        euro:'Volt', color:'#502379', dark:false},
-  OTHERS: {name:'Others', full:'Others',                                family:'—',                     euro:'—',    color:'#c7c4b8', dark:true},
-};
-function textColor(p){return p.dark ? '#1c1e22' : '#ffffff';}
-function fmt(n){return (Math.round(n*10)/10).toString().replace('.0','')+'%';}
-
-/* ---------- 2021 RESULT BARS ---------- */
-const result2021 = [
-  {p:'CDU',v:37.1,s:40},{p:'AfD',v:20.8,s:23},{p:'LINKE',v:11.0,s:12},
-  {p:'SPD',v:8.4,s:9},{p:'FDP',v:6.4,s:7},{p:'GRUENE',v:5.9,s:6},
-];
-const maxV21 = Math.max(...result2021.map(d=>d.v));
-document.getElementById('result2021').innerHTML = result2021.map(d=>{
-  const meta=PARTIES[d.p];
-  return `<div class="barrow">
-    <div class="name" style="color:${meta.color==='#FFD700'?'#a68a00':meta.color}">${meta.name}</div>
-    <div class="track"><div class="fill" style="width:${d.v/maxV21*100}%;background:${meta.color}"></div></div>
-    <div class="val">${fmt(d.v)}<small>${d.s} seats</small></div>
-  </div>`;
-}).join('');
-
-/* ---------- DEMOGRAPHIC VOTE (2021 vs 2026, with change) ---------- */
-const demoParties = ['CDU','AfD','LINKE','SPD','GRUENE','FDP','OTHERS'];
-
-// Renders a table: Group | Party | 2021 | 2026 | Change
-// data2021/data2026 are {subgroupLabel: {CDU:.., AfD:.., ...}}; pass null/{} for data2026 to mark it pending
-function renderDemoTable(elId, subgroups, data2021, data2026){
-  let rows = '';
-  subgroups.forEach(label=>{
-    const v21 = data2021[label] || {};
-    const v26 = (data2026 && data2026[label]) || {};
-    demoParties.forEach((k,i)=>{
-      const meta = PARTIES[k];
-      const a = v21[k], b = v26[k];
-      const change = (a!=null && b!=null) ? (Math.round((b-a)*10)/10) : null;
-      rows += `<tr>
-        ${i===0 ? `<td rowspan="${demoParties.length}" style="vertical-align:top;font-weight:700;border-right:1px solid var(--border)">${label}</td>` : ''}
-        <td style="text-align:left;color:${meta.color==='#FFD700'?'#a68a00':meta.color};font-weight:700">${meta.name}</td>
-        <td>${a!=null ? fmt(a) : '—'}</td>
-        <td style="color:var(--muted)">${b!=null ? fmt(b) : 'pending'}</td>
-        <td style="color:${change==null?'var(--muted)':(change>=0?'var(--green)':'var(--red)')}">${change==null ? 'pending' : (change>0?'+':'')+change}</td>
-      </tr>`;
-    });
-  });
-  document.getElementById(elId).innerHTML = `
-    <thead><tr><th>Group</th><th>Party</th><th>2021</th><th>2026</th><th>Change</th></tr></thead>
-    <tbody>${rows}</tbody>
-  `;
-}
-
-const demoGender2021 = {
-  'Men': {CDU:33, AfD:26, LINKE:11, SPD:8, GRUENE:6, FDP:7},
-  'Women': {CDU:41, AfD:16, LINKE:11, SPD:8, GRUENE:6, FDP:6},
-};
-renderDemoTable('demoGenderTable', ['Men','Women'], demoGender2021, null);
-
-const demoAge2021 = {
-  '18–25': {CDU:20.9, AfD:22.1, LINKE:8.4,  SPD:6.8,  GRUENE:7.4, FDP:12.6, OTHERS:21.8},
-  '25–35': {CDU:22.2, AfD:31.5, LINKE:7.3,  SPD:5.5,  GRUENE:6.1, FDP:7.6,  OTHERS:19.8},
-  '35–45': {CDU:30.4, AfD:32.1, LINKE:6.2,  SPD:5.2,  GRUENE:4.3, FDP:7.2,  OTHERS:14.7},
-  '45–60': {CDU:35.9, AfD:31.2, LINKE:7.9,  SPD:5.1,  GRUENE:3.5, FDP:6.5,  OTHERS:9.9},
-  '60–70': {CDU:40.3, AfD:24.8, LINKE:12.0, SPD:7.6,  GRUENE:2.7, FDP:5.9,  OTHERS:6.7},
-  '70+':   {CDU:47.4, AfD:15.4, LINKE:12.9, SPD:13.5, GRUENE:2.2, FDP:4.5,  OTHERS:4.2},
-};
-renderDemoTable('demoAgeTable', ['18–25','25–35','35–45','45–60','60–70','70+'], demoAge2021, null);
-
-// Education: Hochschulreife/Hochschulabschluss are real 2021 figures (Forschungsgruppe Wahlen
-// exit poll, via KAS Wahlanalyse); Hauptschulabschluss/Mittlere Reife are awaiting confirmed source data.
-const demoEdu2021 = {
-  'Hauptschulabschluss': {},
-  'Mittlere Reife': {},
-  'Hochschulreife': {CDU:32, AfD:18, LINKE:12, SPD:8, GRUENE:7, FDP:8, OTHERS:15},
-  'Hochschulabschluss': {CDU:38, AfD:11, LINKE:13, SPD:11, GRUENE:12, FDP:7, OTHERS:8},
-};
-renderDemoTable('demoEduTable', ['Hauptschulabschluss','Mittlere Reife','Hochschulreife','Hochschulabschluss'], demoEdu2021, null);
-
-// Professional group and rural/urban: awaiting confirmed 2021 source data.
-const demoJob2021 = {
-  'Arbeiter': {}, 'Angestellte': {}, 'Beamte': {}, 'Selbstständige': {}, 'Rentner': {}, 'Arbeitslose': {},
-};
-renderDemoTable('demoJobTable', ['Arbeiter','Angestellte','Beamte','Selbstständige','Rentner','Arbeitslose'], demoJob2021, null);
-
-const demoRural2021 = { 'Stadt': {}, 'Land': {} };
-renderDemoTable('demoRuralTable', ['Stadt','Land'], demoRural2021, null);
-
-/* ---------- POLL CHRONICLE (real, dawum.de) ---------- */
-const polls = [
- {date:'06 Jun 2021',inst:'Result',CDU:37.1,AfD:20.8,LINKE:11.0,SPD:8.4,GRUENE:5.9,FDP:6.4,BSW:null},
- {date:'24 Feb 2022',inst:'Infratest dimap',CDU:33,AfD:20,LINKE:11,SPD:16,GRUENE:6,FDP:5,BSW:null},
- {date:'24 Oct 2023',inst:'INSA',CDU:32,AfD:33,LINKE:9,SPD:8,GRUENE:5,FDP:4,BSW:null},
- {date:'30 Jan 2024',inst:'Institut WK.',CDU:28.5,AfD:27.5,LINKE:3.5,SPD:4.5,GRUENE:4.5,FDP:4.0,BSW:23.0},
- {date:'18 Apr 2024',inst:'INSA',CDU:32,AfD:29,LINKE:5,SPD:8,GRUENE:5,FDP:4,BSW:10},
- {date:'13 Jun 2024',inst:'INSA',CDU:31,AfD:30,LINKE:5,SPD:7,GRUENE:4,FDP:4,BSW:13},
- {date:'05 Jul 2024',inst:'INSA',CDU:29,AfD:29,LINKE:4,SPD:8,GRUENE:4,FDP:4,BSW:16},
- {date:'05 Nov 2024',inst:'INSA',CDU:32,AfD:30,LINKE:3,SPD:7,GRUENE:3,FDP:4,BSW:16},
- {date:'16 Jan 2025',inst:'INSA',CDU:32,AfD:31,LINKE:4,SPD:8,GRUENE:3,FDP:4,BSW:14},
- {date:'19 Jun 2025',inst:'INSA',CDU:34,AfD:30,LINKE:11,SPD:7,GRUENE:3,FDP:2,BSW:8},
- {date:'04 Sep 2025',inst:'Infratest dimap',CDU:27,AfD:39,LINKE:13,SPD:7,GRUENE:3,FDP:null,BSW:6},
- {date:'15 Oct 2025',inst:'INSA',CDU:26,AfD:40,LINKE:11,SPD:6,GRUENE:3,FDP:3,BSW:6},
- {date:'27 Jan 2026',inst:'INSA',CDU:26,AfD:39,LINKE:11,SPD:8,GRUENE:3,FDP:2,BSW:6},
- {date:'25 Mar 2026',inst:'INSA',CDU:25,AfD:38,LINKE:13,SPD:6,GRUENE:4,FDP:3,BSW:5},
- {date:'07 May 2026',inst:'Infratest dimap',CDU:26,AfD:41,LINKE:12,SPD:7,GRUENE:4,FDP:null,BSW:4},
- {date:'13 May 2026',inst:'INSA',CDU:24,AfD:42,LINKE:13,SPD:6,GRUENE:4,FDP:3,BSW:4},
- {date:'03 Jul 2026',inst:'INSA',CDU:23,AfD:41,LINKE:13,SPD:6,GRUENE:4,FDP:4,BSW:5},
- {date:'23 Jul 2026',inst:'INSA',CDU:24,AfD:41,LINKE:14,SPD:5,GRUENE:4,FDP:4,BSW:4},
- {date:'30 Jul 2026',inst:'Infratest dimap',CDU:24,AfD:41,LINKE:13,SPD:7,GRUENE:5,FDP:null,BSW:4},
- {date:'10 Aug 2026',inst:'INSA',CDU:22,AfD:42,LINKE:13,SPD:6,GRUENE:4,FDP:4,BSW:5},
- {date:'12 Aug 2026',inst:'pollytix',CDU:23,AfD:43,LINKE:13,SPD:7,GRUENE:5,FDP:2,BSW:4},
- {date:'25 Aug 2026',inst:'Civey',CDU:21,AfD:43,LINKE:12,SPD:7,GRUENE:5,FDP:4,BSW:4},
- {date:'26 Aug 2026',inst:'Infratest dimap',CDU:22,AfD:42,LINKE:11,SPD:8,GRUENE:6,FDP:3,BSW:4},
- {date:'28 Aug 2026',inst:'FG Wahlen',CDU:23,AfD:40,LINKE:13,SPD:9,GRUENE:6,FDP:3,BSW:3},
-];
-
-new Chart(document.getElementById('trendChart'), {
-  type:'line',
-  data:{
-    datasets:['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'].map(k=>({
-      label: PARTIES[k].name,
-      data: polls.map(p=>({x: parseDate(p.date), y: p[k]})),
-      borderColor: PARTIES[k].color,
-      backgroundColor: PARTIES[k].color,
-      spanGaps:true, pointRadius:3.5, borderWidth:2, tension:0.25,
-      showLine:false,
-    }))
-  },
-  options:{
-    responsive:true,
-    interaction:{mode:'nearest',intersect:false},
-    plugins:{
-      legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}},
-      tooltip:{callbacks:{
-        title: items => fmtDate(items[0].parsed.x),
-        label: ctx => ctx.dataset.label+': '+ctx.formattedValue+'%'
-      }}
+  new Chart(document.getElementById('trendChart'), {
+    type: 'scatter', // scatter, not line — this guarantees no connecting segments are ever drawn
+    data: {
+      datasets: ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'].map(k => ({
+        label: PARTIES[k].name,
+        data: polls
+          .filter(p => p[k] != null)
+          .map(p => ({ x: parseDate(p.date), y: p[k] })),
+        borderColor: PARTIES[k].color,
+        backgroundColor: PARTIES[k].color,
+        pointRadius: 3.5,
+        pointHoverRadius: 5,
+      }))
     },
-    scales:{
-      x:{
-        type:'linear',
-        min: parseDate(polls[0].date),
-        max: parseDate(polls[polls.length-1].date),
-        ticks:{
-          callback: v => fmtDate(v),
-          maxRotation:60, minRotation:60, autoSkip:true, maxTicksLimit:14, font:{size:9.5}
+    options: {
+      responsive: true,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            title: items => fmtDate(items[0].parsed.x),
+            label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          min: parseDate(polls[0].date),
+          max: parseDate(polls[polls.length - 1].date),
+          ticks: {
+            callback: v => fmtDate(v),
+            maxRotation: 60, minRotation: 60, autoSkip: true, maxTicksLimit: 14, font: { size: 9.5 }
+          },
+          grid: { display: false }
         },
-        grid:{display:false}
-      },
-      y:{min:0,max:46,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#eeece4'}}
+        y: { min: 0, max: 46, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#eeece4' } }
+      }
     }
-  }
-});
-
-/* =====================================================================
-   GOOGLE SHEETS — live data (turnout / exit polls)
-   ===================================================================== */
-const SHEET_ID = '1ikZkOUhOHG6VmfxZYZCjEEQiAI82SabRxUOhy9VLpyw';
-const GIDS = { turnout:'497421362', exitVotes:'849299742', exitSeats:'1722111428' };
-function sheetCsvUrl(gid){ return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`; }
-
-function parseCSV(text){
-  return text.trim().split(/\r?\n/).filter(l=>l.length).map(line=>{
-    const cells=[]; let cur='', inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){ if(inQ && line[i+1]==='"'){cur+='"';i++;} else inQ=!inQ; }
-      else if(ch===',' && !inQ){ cells.push(cur); cur=''; }
-      else cur+=ch;
-    }
-    cells.push(cur);
-    return cells.map(c=>c.trim());
   });
-}
-async function fetchSheet(gid){
-  const res = await fetch(sheetCsvUrl(gid));
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const rows = parseCSV(await res.text());
-  if(rows.length<2) throw new Error('no data rows');
-  return rows;
-}
-function matchParty(label){
-  const s = label.toLowerCase().replace(/[äàá]/g,'a').replace(/[üù]/g,'u').replace(/[öò]/g,'o').replace(/ß/g,'ss').trim();
-  const table = {
-    afd:'AfD', cdu:'CDU', spd:'SPD', linke:'LINKE', 'die linke':'LINKE',
-    grune:'GRUENE', gruene:'GRUENE', 'bundnis 90/die grunen':'GRUENE',
-    fdp:'FDP', bsw:'BSW', 'freie wahler':'FW', diebasis:'BASIS', 'die basis':'BASIS',
-    tierschutzpartei:'TSP', gartenpartei:'GARTEN', 'die partei':'PARTEI',
-    tierschutzallianz:'TSA', pdf:'PDF', volt:'VOLT',
-  };
-  return PARTIES[table[s]] ? {key:table[s], meta:PARTIES[table[s]]} : {key:'OTHERS', meta:PARTIES.OTHERS};
-}
-function placeholderHTML(gid, msg){
-  return `<div class="placeholder">${msg}</div>`;
-}
-
-/* Shared, cached fetch of the exit-poll votes sheet so multiple sections can reuse one request */
-let exitVotesPromise = null;
-function getExitVotesRows(){
-  if(!exitVotesPromise) exitVotesPromise = fetchSheet(GIDS.exitVotes).catch(()=>null);
-  return exitVotesPromise;
-}
-function findColumnIndex(header, needle){
-  for(let i=1;i<header.length;i++){ if(header[i].toLowerCase().includes(needle)) return i; }
-  return header.length>1 ? 1 : -1;
-}
-async function getExitVoteFor(partyKey, institute){
-  const rows = await getExitVotesRows();
-  if(!rows) return null;
-  const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-  const colIdx = findColumnIndex(header, institute);
-  if(colIdx<0) return null;
-  const row = body.find(r=>matchParty(r[0]).key===partyKey);
-  if(!row) return null;
-  const val = parseFloat((row[colIdx]||'').replace('%',''));
-  return isNaN(val) ? null : val;
-}
-
-/* Turnout by hour: col 0 = time label, cols 1..n = named series (e.g. 2026, 2021, ...) */
-async function renderTurnout(){
-  const el = document.getElementById('turnoutWrap');
-  try{
-    const rows = await fetchSheet(GIDS.turnout);
-    const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-    const labels = body.map(r=>r[0]);
-    const seriesNames = header.slice(1);
-    const palette = ['#1a2b4a','#70463A','#3399FF','#009900','#990000','#FFD700'];
-    el.innerHTML = `<canvas id="turnoutChart" height="220"></canvas>`;
-    new Chart(document.getElementById('turnoutChart'), {
-      type:'line',
-      data:{ labels, datasets: seriesNames.map((name,i)=>({
-        label:name, data: body.map(r=>parseFloat((r[i+1]||'').replace('%',''))||null),
-        borderColor:palette[i%palette.length], backgroundColor:palette[i%palette.length],
-        spanGaps:true, pointRadius:2, borderWidth:2, tension:0.2,
-      })) },
-      options:{responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}}},
-        scales:{ y:{ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
-    });
-  }catch(e){
-    el.innerHTML = placeholderHTML(GIDS.turnout, 'Turnout-by-hour data will appear here once the linked sheet is populated on election day.');
-  }
-}
-
-/* Exit poll votes: col0 = party, cols1..n = source columns (%) */
-async function renderExitVotes(){
-  const el = document.getElementById('exitVotesWrap');
-  try{
-    const rows = await getExitVotesRows();
-    if(!rows) throw new Error('no data');
-    const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-    const seriesNames = header.slice(1);
-    const labels = body.map(r=>matchParty(r[0]).meta.name);
-    const barColors = body.map(r=>matchParty(r[0]).meta.color);
-    el.innerHTML = `<canvas id="exitVotesChart" height="220"></canvas>`;
-    new Chart(document.getElementById('exitVotesChart'), {
-      type:'bar',
-      data:{ labels, datasets: seriesNames.map((name,i)=>({
-        label:name, data: body.map(r=>parseFloat((r[i+1]||'').replace('%',''))||0),
-        backgroundColor: seriesNames.length>1 ? undefined : barColors,
-        borderRadius:3,
-      })) },
-      options:{responsive:true, plugins:{legend:{display:seriesNames.length>1,position:'bottom'}},
-        scales:{ y:{ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
-    });
-  }catch(e){
-    el.innerHTML = placeholderHTML(GIDS.exitVotes, 'Exit poll (popular vote) figures will appear here once published at 18:00 CEST on 6 September 2026.');
-  }
-}
-
-/* Exit poll seats: col0 = party, cols1..n = source columns (seats) */
-async function renderExitSeats(){
-  const el = document.getElementById('exitSeatsWrap');
-  try{
-    const rows = await fetchSheet(GIDS.exitSeats);
-    const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-    const seriesNames = header.slice(1);
-    const labels = body.map(r=>matchParty(r[0]).meta.name);
-    const barColors = body.map(r=>matchParty(r[0]).meta.color);
-    el.innerHTML = `<canvas id="exitSeatsChart" height="220"></canvas>`;
-    new Chart(document.getElementById('exitSeatsChart'), {
-      type:'bar',
-      data:{ labels, datasets: seriesNames.map((name,i)=>({
-        label:name, data: body.map(r=>parseFloat(r[i+1])||0),
-        backgroundColor: seriesNames.length>1 ? undefined : barColors,
-        borderRadius:3,
-      })) },
-      options:{responsive:true, plugins:{legend:{display:seriesNames.length>1,position:'bottom'}},
-        scales:{ y:{ticks:{stepSize:5},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
-    });
-  }catch(e){
-    el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
-  }
-}
-renderTurnout(); renderExitVotes(); renderExitSeats();
-
-/* ---------- PROJECTIONS: Infratest dimap + FG Wahlen trend chart ---------- */
-const projParties = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
-const projPolls = polls.filter(p=>p.inst==='Infratest dimap' || p.inst==='FG Wahlen');
-new Chart(document.getElementById('projTrendChart'), {
-  type:'line',
-  data:{
-    datasets: projParties.map(k=>({
-      label: PARTIES[k].name,
-      data: projPolls.map(p=>({x: parseDate(p.date), y: p[k], _inst: p.inst})),
-      borderColor: PARTIES[k].color,
-      backgroundColor: PARTIES[k].color,
-      spanGaps:true, pointRadius:4, borderWidth:2, tension:0.25,
-      showLine:false,
-    }))
-  },
-  options:{
-    responsive:true,
-    plugins:{
-      legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}},
-      tooltip:{callbacks:{
-        title: items => fmtDate(items[0].parsed.x)+' ('+(items[0].raw._inst==='Infratest dimap'?'ID':'FGW')+')',
-        label: ctx => ctx.dataset.label+': '+ctx.formattedValue+'%'
-      }}
-    },
-    scales:{
-      x:{
-        type:'linear',
-        min: parseDate(projPolls[0].date),
-        max: parseDate(projPolls[projPolls.length-1].date),
-        ticks:{ callback: v => fmtDate(v), maxRotation:60, minRotation:60, font:{size:9.5} },
-        grid:{display:false}
-      },
-      y:{min:0,max:46,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#eeece4'}}
-    }
-  }
-});
-
-/* ---------- HOCHRECHNUNG: manually-updated running election-night table ----------
-   Add entries here (in chronological order) as new Hochrechnungen are published;
-   each row's parties should sum to roughly 100%. Re-run renderHochrechnungTable()
-   is automatic on load. */
-const hochrechnung = [
-  // { time:'20:15', AfD:null, CDU:null, LINKE:null, SPD:null, GRUENE:null, FDP:null, BSW:null },
-];
-function renderHochrechnungTable(){
-  const el = document.getElementById('hochrechnungTable');
-  el.innerHTML = `<thead><tr><th>Time</th>${projParties.map(k=>`<th>${PARTIES[k].name}</th>`).join('')}</tr></thead>
-    <tbody>
-      ${hochrechnung.map(r=>`<tr>
-        <td class="inst">${r.time}</td>
-        ${projParties.map(k=>`<td style="color:${PARTIES[k].color==='#FFD700'?'#a68a00':PARTIES[k].color};font-weight:700">${r[k]!=null? (r[k]+'%'):'–'}</td>`).join('')}
-      </tr>`).join('')}
-    </tbody>`;
-}
-renderHochrechnungTable();
-
-/* ---------- RESULTS: all 15 contesting parties ---------- */
-const contestants = [
-  {k:'CDU', last:'37.1%'}, {k:'AfD', last:'20.8%'}, {k:'LINKE', last:'11.0%'},
-  {k:'SPD', last:'8.4%'}, {k:'FDP', last:'6.4%'}, {k:'GRUENE', last:'5.9%'},
-  {k:'FW', last:'—'}, {k:'BASIS', last:'—'}, {k:'TSP', last:'—'}, {k:'GARTEN', last:'—'},
-  {k:'PARTEI', last:'—'}, {k:'TSA', last:'—'}, {k:'BSW', last:'new party'},
-  {k:'PDF', last:'—'}, {k:'VOLT', last:'—'},
-];
-document.getElementById('resultsTable').innerHTML = `
-  <thead><tr><th>Party</th><th>European affiliation</th><th>2021 result</th><th>2026 result</th><th>+/-</th></tr></thead>
-  <tbody>
-  ${contestants.map(c=>{
-    const m = PARTIES[c.k];
-    return `<tr>
-      <td style="font-weight:700;color:${m.color==='#FFD700'?'#a68a00':m.color}"><span class="swatch" style="background:${m.color}"></span>&nbsp;${m.name}</td>
-      <td><span class="euro-tag" style="background:${m.color};color:${textColor(m)}">${m.euro}</span></td>
-      <td>${c.last}</td>
-      <td style="color:var(--muted)">pending</td>
-      <td style="color:var(--muted)">pending</td>
-    </tr>`;
-  }).join('')}
-  </tbody>
-`;
-
-/* ---------- AfD BEST / SPD WORST / AfD GAINS ---------- */
-function fmtPP(n){ return (n>=0?'+':'') + (Math.round(n*10)/10).toString().replace('.0','') + 'pp'; }
-function renderRecordList(elId, rows, maxScale, colorHex, pendingVal, pendingId, formatFn=fmt){
-  const bars = rows.map(d=>`
-    <div class="barrow" style="grid-template-columns:34px 100px 1fr 60px;">
-      <div class="name" style="color:var(--muted)">#${d.rank}</div>
-      <div class="name">${d.land}<br><span style="font-weight:400;color:var(--muted);font-size:11px">${d.year}</span></div>
-      <div class="track"><div class="fill" style="width:${Math.abs(d.v)/maxScale*100}%;background:${colorHex}"></div></div>
-      <div class="val">${formatFn(d.v)}</div>
-    </div>`).join('');
-  const pendingBar = `
-    <div class="barrow" id="${pendingId}" style="grid-template-columns:34px 100px 1fr 60px;margin-top:14px;">
-      <div class="name" style="color:var(--muted)">?</div>
-      <div class="name">Sachsen-Anhalt<br><span style="font-weight:400;color:var(--muted);font-size:11px">2026</span></div>
-      <div class="track" style="border:1.5px dashed ${colorHex};background:transparent;"><div class="fill" style="width:${Math.abs(pendingVal)/maxScale*100}%;background:repeating-linear-gradient(45deg,${colorHex},${colorHex} 6px,#ffffff00 6px,#ffffff00 10px);opacity:.55"></div></div>
-      <div class="val" style="color:${colorHex}">pending<small>polling ${formatFn(pendingVal)}</small></div>
-    </div>`;
-  document.getElementById(elId).innerHTML = bars + pendingBar;
-}
-function updatePendingRow(id, colorHex, maxScale, val, formatFn=fmt){
-  const row = document.getElementById(id);
-  if(!row) return;
-  row.outerHTML = `
-    <div class="barrow" id="${id}" style="grid-template-columns:34px 100px 1fr 60px;margin-top:14px;">
-      <div class="name" style="color:var(--muted)">★</div>
-      <div class="name">Sachsen-Anhalt<br><span style="font-weight:400;color:var(--muted);font-size:11px">2026 · Infratest dimap exit poll</span></div>
-      <div class="track"><div class="fill" style="width:${Math.min(Math.abs(val)/maxScale*100,100)}%;background:${colorHex}"></div></div>
-      <div class="val">${formatFn(val)}</div>
-    </div>`;
-}
-
-const afdBest = [
-  {rank:1, v:32.8, year:2024, land:'Thüringen'},
-  {rank:2, v:30.6, year:2024, land:'Sachsen'},
-  {rank:3, v:29.2, year:2024, land:'Brandenburg'},
-  {rank:4, v:27.5, year:2019, land:'Sachsen'},
-  {rank:5, v:24.3, year:2016, land:'Sachsen-Anhalt'},
-];
-const spdWorst = [
-  {rank:1, v:5.5, year:2026, land:'Baden-Württemberg'},
-  {rank:2, v:6.1, year:2024, land:'Thüringen'},
-  {rank:3, v:7.3, year:2024, land:'Sachsen'},
-  {rank:4, v:7.7, year:2019, land:'Sachsen'},
-  {rank:5, v:8.2, year:2019, land:'Thüringen'},
-];
-const afdGains = [
-  {rank:1, v:17.8, year:2019, land:'Sachsen'},
-  {rank:2, v:12.8, year:2019, land:'Thüringen'},
-  {rank:3, v:11.3, year:2019, land:'Brandenburg'},
-  {rank:4, v:11.2, year:2026, land:'Rheinland-Pfalz'},
-  {rank:5, v:9.4, year:2024, land:'Thüringen'},
-];
-const AFD_2021 = 20.8, SPD_2021 = 8.4;
-const afdMax = 45, spdMax = 10, gainMax = 24; // headroom so each pending bar reads against the list
-renderRecordList('afdBest', afdBest, afdMax, PARTIES.AfD.color, 41.7, 'afdSaxonyRow');
-renderRecordList('spdWorst', spdWorst, spdMax, PARTIES.SPD.color, 8.0, 'spdSaxonyRow');
-renderRecordList('afdGains', afdGains, gainMax, PARTIES.AfD.color, 41.7-AFD_2021, 'afdGainSaxonyRow', fmtPP);
-
-(async function updateSaxonyExitRows(){
-  const [afdVal, spdVal] = await Promise.all([
-    getExitVoteFor('AfD','infratest'),
-    getExitVoteFor('SPD','infratest'),
-  ]);
-  if(afdVal!=null){
-    updatePendingRow('afdSaxonyRow', PARTIES.AfD.color, afdMax, afdVal);
-    updatePendingRow('afdGainSaxonyRow', PARTIES.AfD.color, gainMax, afdVal-AFD_2021, fmtPP);
-  }
-  if(spdVal!=null) updatePendingRow('spdSaxonyRow', PARTIES.SPD.color, spdMax, spdVal);
 })();
 
-/* ---------- ELECTORAL HISTORY (real results 1990-2021 + 2026 polling avg) ---------- */
-const histYears = ['1990','1994','1998','2002','2006','2011','2016','2021','2026*'];
-const histData = {
-  CDU:   [39.0,34.4,22.0,37.3,36.2,32.5,29.8,37.1,22.2],
-  AfD:   [0,0,0,0,0,0,24.3,20.8,41.7],
-  LINKE: [12.0,19.9,19.6,20.4,24.1,23.7,16.3,11.0,12.1],
-  SPD:   [26.0,34.0,35.9,20.0,21.4,21.5,10.6,8.4,8.0],
-  GRUENE:[5.3,5.1,3.2,2.0,3.6,7.1,5.2,5.9,5.6],
-  FDP:   [13.5,3.6,4.2,13.3,6.7,3.8,4.9,6.4,3.1],
-  BSW:   [0,0,0,0,0,0,0,0,3.7],
-  DVU:   [0,0,12.9,0,0,0,0,0,0],
-  OTHERS:[4.2,3.0,2.2,6.9,8.0,11.4,8.9,10.3,3.6],
-};
-new Chart(document.getElementById('historyChart'), {
-  type:'bar',
-  data:{ labels:histYears, datasets:Object.keys(histData).map(k=>({
-    label:PARTIES[k].name, data:histData[k], backgroundColor:PARTIES[k].color, stack:'s',
-  })) },
-  options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}}},
-    scales:{ x:{stacked:true,grid:{display:false}}, y:{stacked:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}} } }
-});
+/* ---------- PROJECTIONS CHART (dots only, true date-linear x-axis) ---------- */
+(function(){
+  const existing = Chart.getChart('projTrendChart');
+  if (existing) existing.destroy();
+
+  const projParties = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
+  const projPolls = polls.filter(p => p.inst === 'Infratest dimap' || p.inst === 'FG Wahlen');
+
+  new Chart(document.getElementById('projTrendChart'), {
+    type: 'scatter',
+    data: {
+      datasets: projParties.map(k => ({
+        label: PARTIES[k].name,
+        data: projPolls
+          .filter(p => p[k] != null)
+          .map(p => ({ x: parseDate(p.date), y: p[k], _inst: p.inst })),
+        borderColor: PARTIES[k].color,
+        backgroundColor: PARTIES[k].color,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }))
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            title: items => fmtDate(items[0].parsed.x) + ' (' + (items[0].raw._inst === 'Infratest dimap' ? 'ID' : 'FGW') + ')',
+            label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          min: parseDate(projPolls[0].date),
+          max: parseDate(projPolls[projPolls.length - 1].date),
+          ticks: { callback: v => fmtDate(v), maxRotation: 60, minRotation: 60, font: { size: 9.5 } },
+          grid: { display: false }
+        },
+        y: { min: 0, max: 46, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#eeece4' } }
+      }
+    }
+  });
+})();
