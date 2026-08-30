@@ -515,25 +515,51 @@ const polls = [
  {date:'28 Aug 2026',inst:'FG Wahlen',CDU:23,AfD:40,LINKE:13,SPD:9,GRUENE:6,FDP:3,BSW:3},
 ];
 
+function parsePollDate(str) {
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const [day, mon, year] = str.split(' ');
+  return new Date(parseInt(year), months[mon], parseInt(day)).getTime();
+}
+
 new Chart(document.getElementById('trendChart'), {
-  type:'line',
-  data:{
-    labels: polls.map(p=>p.date),
-    datasets:['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'].map(k=>({
+  type: 'scatter',
+  data: {
+    datasets: ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'].map(k => ({
       label: PARTIES[k].name,
-      data: polls.map(p=>p[k]),
+      data: polls
+        .filter(p => p[k] != null)
+        .map(p => ({ x: parsePollDate(p.date), y: p[k] })),
       borderColor: PARTIES[k].color,
       backgroundColor: PARTIES[k].color,
-      spanGaps:true, pointRadius:2.5, borderWidth:2, tension:0.25,
+      showLine: false,
+      pointRadius: 3.5,
+      pointHoverRadius: 5,
     }))
   },
   options:{
     responsive:true,
     interaction:{mode:'nearest',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}},
-      tooltip:{callbacks:{label:(ctx)=> ctx.dataset.label+': '+ctx.formattedValue+'%'}}},
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}},
+      tooltip:{
+        callbacks:{
+          title:(items)=> items.length ? new Date(items[0].parsed.x).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '',
+          label:(ctx)=> ctx.dataset.label+': '+ctx.parsed.y+'%'
+        }
+      }
+    },
     scales:{
-      x:{ticks:{maxRotation:60,minRotation:60,autoSkip:true,maxTicksLimit:14,font:{size:9.5}},grid:{display:false}},
+      x:{
+        type:'linear',
+        min: parsePollDate(polls[0].date),
+        max: parsePollDate(polls[polls.length-1].date),
+        ticks:{
+          maxTicksLimit:14,
+          font:{size:9.5},
+          callback: v => new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
+        },
+        grid:{display:false}
+      },
       y:{min:0,max:46,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#eeece4'}}
     }
   }
