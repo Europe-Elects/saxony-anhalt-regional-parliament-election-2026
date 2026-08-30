@@ -521,50 +521,125 @@ function parsePollDate(str) {
   return new Date(parseInt(year), months[mon], parseInt(day)).getTime();
 }
 
+function parsePollDate(str) {
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const [day, mon, year] = str.split(' ');
+  return new Date(parseInt(year), months[mon], parseInt(day)).getTime();
+}
+
+// Simple LOESS (degree-1, tricube-weighted local regression)
+function loess(points, bandwidth = 0.4, evalPoints) {
+  const pts = [...points].sort((a, b) => a.x - b.x);
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const n = xs.length;
+  if (n < 2) return evalPoints.map(x => ({ x, y: n ? ys[0] : null }));
+  const k = Math.max(2, Math.ceil(bandwidth * n));
+
+  return evalPoints.map(x0 => {
+    const dists = xs.map(x => Math.abs(x - x0));
+    const h = [...dists].sort((a, b) => a - b)[Math.min(k - 1, n - 1)] || 1;
+    const weights = dists.map(d => {
+      const u = d / h;
+      return u < 1 ? Math.pow(1 - Math.pow(u, 3), 3) : 0;
+    });
+    let sw = 0, swx = 0, swy = 0, swxy = 0, swxx = 0;
+    for (let i = 0; i < n; i++) {
+      const w = weights[i];
+      sw += w; swx += w * xs[i]; swy += w * ys[i];
+      swxy += w * xs[i] * ys[i]; swxx += w * xs[i] * xs[i];
+    }
+    const denom = sw * swxx - swx * swx;
+    let slope = 0, intercept = sw ? swy / sw : ys[0];
+    if (Math.abs(denom) > 1e-9) {
+      slope = (sw * swxy - swx * swy) / denom;
+      intercept = (swy - slope * swx) / sw;
+    }
+    return { x: x0, y: intercept + slope * x0 };
+  });
+}
+
+function hexToRgba(hex, alpha) {
+  const v = hex.replace('#', '');
+  const r = parseInt(v.substring(0, 2), 16);
+  const g = parseInt(v.substring(2, 4), 16);
+  const b = parseInt(v.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+const trendMinX = parsePollDate(polls[0].date);
+const trendMaxX = parsePollDate(polls[polls.length - 1].date);
+const trendEvalX = Array.from({ length: 60 }, (_, i) => trendMinX + (i / 59) * (trendMaxX - trendMinX));
+
+const trendPartyKeys = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
+
+const pointDatasets = trendPartyKeys.map(k => ({
+  label: PARTIES[k].name,
+  data: polls.filter(p => p[k] != null).map(p => ({ x: parsePollDate(p.date), y: p[k] })),
+  borderColor: PARTIES[k].color,
+  backgroundColor: PARTIES[k].color,
+  showLine: false,
+  pointRadius: 3.5,
+  pointHoverRadius: 5,
+  order: 1,
+}));
+
+const trendDatasets = trendPartyKeys.map(k => {
+  const pts = polls.filter(p => p[k] != null).map(p => ({ x: parsePollDate(p.date), y: p[k] }));
+  return {
+    label: PARTIES[k].name + ' (trend)',
+    data: loess(pts, 0.4, trendEvalX),
+    type: 'line',
+    borderColor: hexToRgba(PARTIES[k].color, 0.55),
+    backgroundColor: 'transparent',
+    borderWidth: 2.5,
+    pointRadius: 0,
+    pointHoverRadius: 0,
+    tension: 0.15,
+    fill: false,
+    order: 0,
+    hidden: false,
+  };
+});
+
 new Chart(document.getElementById('trendChart'), {
   type: 'scatter',
-  data: {
-    datasets: ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'].map(k => ({
-      label: PARTIES[k].name,
-      data: polls
-        .filter(p => p[k] != null)
-        .map(p => ({ x: parsePollDate(p.date), y: p[k] })),
-      borderColor: PARTIES[k].color,
-      backgroundColor: PARTIES[k].color,
-      showLine: false,
-      pointRadius: 3.5,
-      pointHoverRadius: 5,
-    }))
-  },
-  options:{
-    responsive:true,
-    interaction:{mode:'nearest',intersect:false},
-    plugins:{
-      legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}},
-      tooltip:{
-        callbacks:{
-          title:(items)=> items.length ? new Date(items[0].parsed.x).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '',
-          label:(ctx)=> ctx.dataset.label+': '+ctx.parsed.y+'%'
+  data: { datasets: [...trendDatasets, ...pointDatasets] },
+  options: {
+    responsive: true,
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 11,
+          font: { size: 11 },
+          filter: (item) => !item.text.endsWith('(trend)'), // hide trend entries from legend
+        }
+      },
+      tooltip: {
+        filter: (item) => !item.dataset.label.endsWith('(trend)'), // don't show trend values in tooltip
+        callbacks: {
+          title: (items) => items.length ? new Date(items[0].parsed.x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) : '',
+          label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
         }
       }
     },
-    scales:{
-      x:{
-        type:'linear',
-        min: parsePollDate(polls[0].date),
-        max: parsePollDate(polls[polls.length-1].date),
-        ticks:{
-          maxTicksLimit:14,
-          font:{size:9.5},
-          callback: v => new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
+    scales: {
+      x: {
+        type: 'linear',
+        min: trendMinX,
+        max: trendMaxX,
+        ticks: {
+          maxTicksLimit: 14,
+          font: { size: 9.5 },
+          callback: v => new Date(v).toLocaleDateString('en-GB', {day:'2-digit', month:'short'})
         },
-        grid:{display:false}
+        grid: { display: false }
       },
-      y:{min:0,max:46,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#eeece4'}}
+      y: { min: 0, max: 46, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#eeece4' } }
     }
   }
 });
-
 /* =====================================================================
    GOOGLE SHEETS — live data (turnout / exit polls)
    ===================================================================== */
