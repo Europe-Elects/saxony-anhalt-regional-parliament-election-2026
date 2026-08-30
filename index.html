@@ -568,7 +568,16 @@ function hexToRgba(hex, alpha) {
 
 const trendMinX = parsePollDate(polls[0].date);
 const trendMaxX = parsePollDate(polls[polls.length - 1].date);
-const trendEvalX = Array.from({ length: 60 }, (_, i) => trendMinX + (i / 59) * (trendMaxX - trendMinX));
+
+// Per-party overrides for where each trend line starts (defaults to trendMinX).
+// BSW didn't exist/poll until 2024, so start its line there instead of extrapolating back to 2021.
+const trendStartOverrides = {
+  BSW: parsePollDate('08 Jan 2024'),
+};
+
+function makeEvalX(startX, endX, steps = 60) {
+  return Array.from({ length: steps }, (_, i) => startX + (i / (steps - 1)) * (endX - startX));
+}
 
 const trendPartyKeys = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
 
@@ -582,6 +591,25 @@ const pointDatasets = trendPartyKeys.map(k => ({
   pointHoverRadius: 5,
   order: 1,
 }));
+
+const trendDatasets = trendPartyKeys.map(k => {
+  const pts = polls.filter(p => p[k] != null).map(p => ({ x: parsePollDate(p.date), y: p[k] }));
+  const startX = trendStartOverrides[k] ?? trendMinX;
+  const evalX = makeEvalX(startX, trendMaxX);
+  return {
+    label: PARTIES[k].name + ' (trend)',
+    data: loess(pts, 0.4, evalX),
+    type: 'line',
+    borderColor: hexToRgba(PARTIES[k].color, 0.55),
+    backgroundColor: 'transparent',
+    borderWidth: 2.5,
+    pointRadius: 0,
+    pointHoverRadius: 0,
+    tension: 0.15,
+    fill: false,
+    order: 0,
+  };
+});
 
 const trendDatasets = trendPartyKeys.map(k => {
   const pts = polls.filter(p => p[k] != null).map(p => ({ x: parsePollDate(p.date), y: p[k] }));
