@@ -392,19 +392,19 @@ Chart.defaults.font.family = "'Advent Pro', sans-serif";
 Chart.defaults.font.weight = '600';
 
 const PARTIES = {
-  CDU:    {name:'CDU (EPP)',    full:'Christlich Demokratische Union',        family:'Christian Democrats',  euro:'EPP',  color:'#3399FF', dark:false},
-  AfD:    {name:'AfD (ESN)',    full:'Alternative für Deutschland',           family:'Far-right / populist',  euro:'ESN',  color:'#70463A', dark:false},
+  CDU:    {name:'CDU (EPP)',    full:'Christlich Demokratische Union',        family:'Christian Democrats',  euro:'EPP (EPP)',  color:'#3399FF', dark:false},
+  AfD:    {name:'AfD (ESN)',    full:'Alternative für Deutschland',           family:'Far-right / populist',  euro:'ESN (ESN)',  color:'#70463A', dark:false},
   LINKE:  {name:'Linke (LEFT)', full:'Die Linke',                             family:'Left-wing',             euro:'EL (LEFT)', color:'#990000', dark:false},
   SPD:    {name:'SPD (S&D)',    full:'Sozialdemokratische Partei Deutschlands',family:'Social Democrats',     euro:'PES (S&D)',  color:'#FF0000', dark:false},
   GRUENE: {name:'Grüne (Greens/EFA)', full:'Bündnis 90/Die Grünen',           family:'Greens',                euro:'EGP (Greens/EFA)', color:'#009900', dark:false},
   FDP:    {name:'FDP (RE)',     full:'Freie Demokratische Partei',            family:'Liberal',               euro:'ALDE (RE)',   color:'#FFD700', dark:true},
-  BSW:    {name:'BSW (NI)',     full:'Bündnis Sahra Wagenknecht',             family:'Left-conservative',     euro:'NI',   color:'#9aa0a6', dark:false},
+  BSW:    {name:'BSW (NI)',     full:'Bündnis Sahra Wagenknecht',             family:'Left-conservative',     euro:'None (NI)',   color:'#9aa0a6', dark:false},
   FW:     {name:'FW (RE)',      full:'Freie Wähler',                          family:'Centrist',              euro:'EDP (RE)',   color:'#fa8c00', dark:false},
-  BASIS:  {name:'dieBasis', full:'Basisdemokratische Partei',           family:'Independent',           euro:'None', color:'#b9b6ab', dark:false},
+  BASIS:  {name:'dieBasis', full:'Basisdemokratische Partei',           family:'Independent',           euro:'None (*)', color:'#b9b6ab', dark:false},
   TSP:    {name:'Tierschutzpartei', full:'Partei Mensch Klima Tierschutz', family:'Animal rights',       euro:'Animal Politics (LEFT)', color:'#009076', dark:false},
-  GARTEN: {name:'Gartenpartei', full:'Gartenpartei',                    family:'Single-issue',          euro:'None', color:'#8fae4c', dark:false},
+  GARTEN: {name:'Gartenpartei', full:'Gartenpartei',                    family:'Single-issue',          euro:'None (*)', color:'#8fae4c', dark:false},
   PARTEI: {name:'Die PARTEI', full:'Die PARTEI',                        family:'Satirical',             euro:'None (NI)', color:'#7a6c5d', dark:false},
-  TSA:    {name:'Tierschutzallianz', full:'Allianz für Menschenrechte, Tier- und Naturschutz', family:'Animal rights', euro:'None', color:'#00a68c', dark:false},
+  TSA:    {name:'Tierschutzallianz', full:'Allianz für Menschenrechte, Tier- und Naturschutz', family:'Animal rights', euro:'None (*)', color:'#00a68c', dark:false},
   PDF:    {name:'PdF',    full:'Partei des Fortschritts',               family:'Digital democracy',     euro:'EDP (RE)', color:'#fa8c00', dark:false},
   VOLT:   {name:'Volt',   full:'Volt Deutschland',                      family:'Eurofederalist',        euro:'Volt (Greens/EFA)', color:'#502379', dark:false},
   OTHERS: {name:'Others', full:'Others',                                family:'—',                     euro:'—',    color:'#c7c4b8', dark:true},
@@ -807,7 +807,7 @@ const contestants = [
   {k:'PDF', last:'—'}, {k:'VOLT', last:'—'},
 ];
 document.getElementById('resultsTable').innerHTML = `
-  <thead><tr><th>Party</th><th>European affiliation</th><th>2021 result</th><th>2026 result</th><th>+/-</th></tr></thead>
+  <thead><tr><th>Party</th><th>Europarty (EU Group)</th><th>2021 result</th><th>2026 result</th><th>+/-</th></tr></thead>
   <tbody>
   ${contestants.map(c=>{
     const m = PARTIES[c.k];
