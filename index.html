@@ -587,7 +587,7 @@ new Chart(document.getElementById('trendChart'), {
         ticks: {
           maxTicksLimit: 14,
           font: { size: 9.5 },
-          callback: v => new Date(v).toLocaleDateString('en-GB', {day:'2-digit', month:'short'})
+callback: v => new Date(v).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})
         },
         grid: { display: false }
       },
