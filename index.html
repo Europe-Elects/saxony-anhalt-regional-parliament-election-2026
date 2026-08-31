@@ -603,7 +603,7 @@ const trendDatasets = trendPartyKeys.map(k => {
 
 new Chart(document.getElementById('trendChart'), {
   type: 'scatter',
-  data: { datasets: [...trendDatasets, ...pointDatasets] },
+  data: { datasets: pointDatasets },
   options: {
     responsive: true,
     interaction: { mode: 'nearest', intersect: false },
