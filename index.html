@@ -457,18 +457,18 @@ function renderDemoTable(elId, subgroups, data2021, data2026){
 }
 
 const demoGender2021 = {
-  'Men': {CDU:31.9, AfD:32.4, LINKE:9.6, SPD:7.5, GRUENE:3.6, FDP:6.7, BSW:–},
-  'Women': {CDU:41.9, AfD:19.2, LINKE:9.7, SPD:8.0, GRUENE:3.5, FDP:6.1, BSW:–},
+  'Men': {CDU:31.9, AfD:32.4, LINKE:9.6, SPD:7.5, GRUENE:3.6, FDP:6.7, BSW:null},
+  'Women': {CDU:41.9, AfD:19.2, LINKE:9.7, SPD:8.0, GRUENE:3.5, FDP:6.1, BSW:null},
 };
 renderDemoTable('demoGenderTable', ['Men','Women'], demoGender2021, null);
 
 const demoAge2021 = {
-  '18–25': {CDU:20.9, AfD:22.1, LINKE:8.4,  SPD:6.8,  GRUENE:7.4, FDP:12.6, BSW:–},
-  '25–35': {CDU:22.2, AfD:31.5, LINKE:7.3,  SPD:5.5,  GRUENE:6.1, FDP:7.6,  BSW:–},
-  '35–45': {CDU:30.4, AfD:32.1, LINKE:6.2,  SPD:5.2,  GRUENE:4.3, FDP:7.2,  BSW:–},
-  '45–60': {CDU:35.9, AfD:31.2, LINKE:7.9,  SPD:5.1,  GRUENE:3.5, FDP:6.5,  BSW:–},
-  '60–70': {CDU:40.3, AfD:24.8, LINKE:12.0, SPD:7.6,  GRUENE:2.7, FDP:5.9,  BSW:–},
-  '70+':   {CDU:47.4, AfD:15.4, LINKE:12.9, SPD:13.5, GRUENE:2.2, FDP:4.5,  BSW:–},
+  '18–25': {CDU:20.9, AfD:22.1, LINKE:8.4,  SPD:6.8,  GRUENE:7.4, FDP:12.6, BSW:null},
+  '25–35': {CDU:22.2, AfD:31.5, LINKE:7.3,  SPD:5.5,  GRUENE:6.1, FDP:7.6,  BSW:null},
+  '35–45': {CDU:30.4, AfD:32.1, LINKE:6.2,  SPD:5.2,  GRUENE:4.3, FDP:7.2,  BSW:null},
+  '45–60': {CDU:35.9, AfD:31.2, LINKE:7.9,  SPD:5.1,  GRUENE:3.5, FDP:6.5,  BSW:null},
+  '60–70': {CDU:40.3, AfD:24.8, LINKE:12.0, SPD:7.6,  GRUENE:2.7, FDP:5.9,  BSW:null},
+  '70+':   {CDU:47.4, AfD:15.4, LINKE:12.9, SPD:13.5, GRUENE:2.2, FDP:4.5,  BSW:null},
 };
 renderDemoTable('demoAgeTable', ['18–25','25–35','35–45','45–60','60–70','70+'], demoAge2021, null);
 
@@ -477,8 +477,8 @@ renderDemoTable('demoAgeTable', ['18–25','25–35','35–45','45–60','60–7
 const demoEdu2021 = {
   'Hauptschulabschluss': {},
   'Mittlere Reife': {},
-  'Hochschulreife': {CDU:32, AfD:18, LINKE:12, SPD:8, GRUENE:7, FDP:8, BSW:–},
-  'Hochschulabschluss': {CDU:38, AfD:11, LINKE:13, SPD:11, GRUENE:12, FDP:7, BSW:–},
+  'Hochschulreife': {CDU:32, AfD:18, LINKE:12, SPD:8, GRUENE:7, FDP:8, BSW:null},
+  'Hochschulabschluss': {CDU:38, AfD:11, LINKE:13, SPD:11, GRUENE:12, FDP:7, BSW:null},
 };
 renderDemoTable('demoEduTable', ['Hauptschulabschluss','Mittlere Reife','Hochschulreife','Hochschulabschluss'], demoEdu2021, null);
 
