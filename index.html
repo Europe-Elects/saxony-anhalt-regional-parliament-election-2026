@@ -608,6 +608,7 @@ new Chart(document.getElementById('trendChart'), {
   data: { datasets: pointDatasets },
   options: {
     responsive: true,
+      maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: false },
     plugins: {
       legend: {
