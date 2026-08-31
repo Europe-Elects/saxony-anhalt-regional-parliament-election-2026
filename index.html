@@ -662,31 +662,45 @@ async function getExitVoteFor(partyKey, institute){
   return isNaN(val) ? null : val;
 }
 
-/* Turnout by hour: col 0 = time label, cols 1..n = named series (e.g. 2026, 2021, ...) */
+/* Turnout by hour: row 0 = header (col0 label + time-of-day columns), 
+   each subsequent row = one year's series: col 0 = year, cols 1..n = % turnout at that time */
 async function renderTurnout(){
   const el = document.getElementById('turnoutWrap');
   try{
     const rows = await fetchSheet(GIDS.turnout);
-    const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-    const labels = body.map(r=>r[0]);
-    const seriesNames = header.slice(1);
+    const header = rows[0];
+    const body = rows.slice(1).filter(r=>r[0]);
+
+    const labels = header.slice(1);           // time-of-day labels, e.g. '08:00', '09:00', ...
+    const seriesNames = body.map(r=>r[0]);     // one series per year, e.g. '2026', '2021', ...
     const palette = ['#1a2b4a','#70463A','#3399FF','#009900','#990000','#FFD700'];
+
     el.innerHTML = `<canvas id="turnoutChart" height="220"></canvas>`;
     new Chart(document.getElementById('turnoutChart'), {
       type:'line',
-      data:{ labels, datasets: seriesNames.map((name,i)=>({
-        label:name, data: body.map(r=>parseFloat((r[i+1]||'').replace('%',''))||null),
-        borderColor:palette[i%palette.length], backgroundColor:palette[i%palette.length],
-        spanGaps:true, pointRadius:2, borderWidth:2, tension:0.2,
-      })) },
-      options:{responsive:true, plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}}},
-        scales:{ y:{ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
+      data:{
+        labels,
+        datasets: body.map((row, i) => ({
+          label: seriesNames[i],
+          data: row.slice(1).map(v => parseFloat((v||'').replace('%','')) || null),
+          borderColor: palette[i % palette.length],
+          backgroundColor: palette[i % palette.length],
+          spanGaps: true, pointRadius: 2, borderWidth: 2, tension: 0.2,
+        }))
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:11}}}},
+        scales:{
+          y:{ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}},
+          x:{grid:{display:false}}
+        }
+      }
     });
   }catch(e){
     el.innerHTML = placeholderHTML(GIDS.turnout, 'Turnout-by-hour data will appear here once the linked sheet is populated on election day.');
   }
 }
-
 /* Exit poll votes: col0 = party, cols1..n = source columns (%) */
 async function renderExitVotes(){
   const el = document.getElementById('exitVotesWrap');
