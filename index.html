@@ -265,13 +265,13 @@
 
   <div class="card">
     <h3>By professional group</h3>
-    <div class="sub">Arbeiter / Angestellte / Beamte / Selbstständige / Rentner / Arbeitslose</div>
+    <div class="sub">Workers / Employees / Civil Servants / Pensioners / Unemployed</div>
     <table id="demoJobTable"></table>
   </div>
 
   <div class="card">
     <h3>By rural / urban</h3>
-    <div class="sub">Stadt / Land</div>
+    <div class="sub">Urban / Rural</div>
     <table id="demoRuralTable"></table>
   </div>
 
@@ -490,8 +490,8 @@ const demoJob2021 = {
 };
 renderDemoTable('demoJobTable', ['Arbeiter','Angestellte','Beamte','Selbstständige','Rentner','Arbeitslose'], demoJob2021, null);
 
-const demoRural2021 = { 'Stadt': {}, 'Land': {} };
-renderDemoTable('demoRuralTable', ['Stadt','Land'], demoRural2021, null);
+const demoRural2021 = { 'Urban': {}, 'Rural': {} };
+renderDemoTable('demoRuralTable', ['Urban','Rural'], demoRural2021, null);
 
 /* ---------- POLL CHRONICLE (source: table provided, verbatim) ---------- */
 const polls = [
@@ -840,25 +840,25 @@ function updatePendingRow(id, colorHex, maxScale, val, formatFn=fmt){
 }
 
 const afdBest = [
-  {rank:1, v:32.8, year:2024, land:'Thüringen'},
-  {rank:2, v:30.6, year:2024, land:'Sachsen'},
+  {rank:1, v:32.8, year:2024, land:'Thuringia'},
+  {rank:2, v:30.6, year:2024, land:'Saxony'},
   {rank:3, v:29.2, year:2024, land:'Brandenburg'},
-  {rank:4, v:27.5, year:2019, land:'Sachsen'},
-  {rank:5, v:24.3, year:2016, land:'Sachsen-Anhalt'},
+  {rank:4, v:27.5, year:2019, land:'Saxony'},
+  {rank:5, v:24.3, year:2016, land:'Saxony-Anhalt'},
 ];
 const spdWorst = [
   {rank:1, v:5.5, year:2026, land:'Baden-Württemberg'},
-  {rank:2, v:6.1, year:2024, land:'Thüringen'},
-  {rank:3, v:7.3, year:2024, land:'Sachsen'},
-  {rank:4, v:7.7, year:2019, land:'Sachsen'},
-  {rank:5, v:8.2, year:2019, land:'Thüringen'},
+  {rank:2, v:6.1, year:2024, land:'Thuringia'},
+  {rank:3, v:7.3, year:2024, land:'Saxony'},
+  {rank:4, v:7.7, year:2019, land:'Saxony'},
+  {rank:5, v:8.2, year:2019, land:'Thuringia'},
 ];
 const afdGains = [
-  {rank:1, v:17.8, year:2019, land:'Sachsen'},
-  {rank:2, v:12.8, year:2019, land:'Thüringen'},
+  {rank:1, v:17.8, year:2019, land:'Saxony'},
+  {rank:2, v:12.8, year:2019, land:'Thuringia'},
   {rank:3, v:11.3, year:2019, land:'Brandenburg'},
-  {rank:4, v:11.2, year:2026, land:'Rheinland-Pfalz'},
-  {rank:5, v:9.4, year:2024, land:'Thüringen'},
+  {rank:4, v:11.2, year:2026, land:'Rhineland-Palatinate'},
+  {rank:5, v:9.4, year:2024, land:'Thuringia'},
 ];
 const AFD_2021 = 20.8, SPD_2021 = 8.4;
 const afdMax = 45, spdMax = 10, gainMax = 24; // headroom so each pending bar reads against the list
