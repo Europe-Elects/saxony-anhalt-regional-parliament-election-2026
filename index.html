@@ -388,6 +388,9 @@
 Chart.defaults.font.family = "'Advent Pro', sans-serif";
 Chart.defaults.font.weight = '600';
 
+Chart.defaults.font.family = "'Advent Pro', sans-serif";
+Chart.defaults.font.weight = '600';
+
 const PARTIES = {
   CDU:    {name:'CDU (EPP)',    full:'Christlich Demokratische Union',        family:'Christian Democrats',  euro:'EPP',  color:'#3399FF', dark:false},
   AfD:    {name:'AfD (ESN)',    full:'Alternative für Deutschland',           family:'Far-right / populist',  euro:'ESN',  color:'#70463A', dark:false},
@@ -488,32 +491,31 @@ renderDemoTable('demoJobTable', ['Arbeiter','Angestellte','Beamte','Selbstständ
 const demoRural2021 = { 'Stadt': {}, 'Land': {} };
 renderDemoTable('demoRuralTable', ['Stadt','Land'], demoRural2021, null);
 
-/* ---------- POLL CHRONICLE (real, dawum.de) ---------- */
+/* ---------- POLL CHRONICLE (source: table provided, verbatim) ---------- */
 const polls = [
- {date:'06 Jun 2021',inst:'Result',CDU:37.1,AfD:20.8,LINKE:11.0,SPD:8.4,GRUENE:5.9,FDP:6.4,BSW:null},
- {date:'24 Feb 2022',inst:'Infratest dimap',CDU:33,AfD:20,LINKE:11,SPD:16,GRUENE:6,FDP:5,BSW:null},
- {date:'24 Oct 2023',inst:'INSA',CDU:32,AfD:33,LINKE:9,SPD:8,GRUENE:5,FDP:4,BSW:null},
- {date:'30 Jan 2024',inst:'Institut WK.',CDU:28.5,AfD:27.5,LINKE:3.5,SPD:4.5,GRUENE:4.5,FDP:4.0,BSW:23.0},
- {date:'18 Apr 2024',inst:'INSA',CDU:32,AfD:29,LINKE:5,SPD:8,GRUENE:5,FDP:4,BSW:10},
- {date:'13 Jun 2024',inst:'INSA',CDU:31,AfD:30,LINKE:5,SPD:7,GRUENE:4,FDP:4,BSW:13},
- {date:'05 Jul 2024',inst:'INSA',CDU:29,AfD:29,LINKE:4,SPD:8,GRUENE:4,FDP:4,BSW:16},
- {date:'05 Nov 2024',inst:'INSA',CDU:32,AfD:30,LINKE:3,SPD:7,GRUENE:3,FDP:4,BSW:16},
- {date:'16 Jan 2025',inst:'INSA',CDU:32,AfD:31,LINKE:4,SPD:8,GRUENE:3,FDP:4,BSW:14},
- {date:'19 Jun 2025',inst:'INSA',CDU:34,AfD:30,LINKE:11,SPD:7,GRUENE:3,FDP:2,BSW:8},
- {date:'04 Sep 2025',inst:'Infratest dimap',CDU:27,AfD:39,LINKE:13,SPD:7,GRUENE:3,FDP:null,BSW:6},
- {date:'15 Oct 2025',inst:'INSA',CDU:26,AfD:40,LINKE:11,SPD:6,GRUENE:3,FDP:3,BSW:6},
- {date:'27 Jan 2026',inst:'INSA',CDU:26,AfD:39,LINKE:11,SPD:8,GRUENE:3,FDP:2,BSW:6},
- {date:'25 Mar 2026',inst:'INSA',CDU:25,AfD:38,LINKE:13,SPD:6,GRUENE:4,FDP:3,BSW:5},
- {date:'07 May 2026',inst:'Infratest dimap',CDU:26,AfD:41,LINKE:12,SPD:7,GRUENE:4,FDP:null,BSW:4},
- {date:'13 May 2026',inst:'INSA',CDU:24,AfD:42,LINKE:13,SPD:6,GRUENE:4,FDP:3,BSW:4},
- {date:'03 Jul 2026',inst:'INSA',CDU:23,AfD:41,LINKE:13,SPD:6,GRUENE:4,FDP:4,BSW:5},
- {date:'23 Jul 2026',inst:'INSA',CDU:24,AfD:41,LINKE:14,SPD:5,GRUENE:4,FDP:4,BSW:4},
- {date:'30 Jul 2026',inst:'Infratest dimap',CDU:24,AfD:41,LINKE:13,SPD:7,GRUENE:5,FDP:null,BSW:4},
- {date:'10 Aug 2026',inst:'INSA',CDU:22,AfD:42,LINKE:13,SPD:6,GRUENE:4,FDP:4,BSW:5},
- {date:'12 Aug 2026',inst:'pollytix',CDU:23,AfD:43,LINKE:13,SPD:7,GRUENE:5,FDP:2,BSW:4},
- {date:'25 Aug 2026',inst:'Civey',CDU:21,AfD:43,LINKE:12,SPD:7,GRUENE:5,FDP:4,BSW:4},
- {date:'26 Aug 2026',inst:'Infratest dimap',CDU:22,AfD:42,LINKE:11,SPD:8,GRUENE:6,FDP:3,BSW:4},
- {date:'28 Aug 2026',inst:'FG Wahlen',CDU:23,AfD:40,LINKE:13,SPD:9,GRUENE:6,FDP:3,BSW:3},
+ {date:'24 Feb 2022',inst:'Infratest dimap',field:'17–22 Feb 2022',CDU:33,SPD:16,GRUENE:6,FDP:5,LINKE:11,AfD:20,BSW:null},
+ {date:'21 Mar 2023',inst:'INSA',field:'6–13 Mar 2023',CDU:35,SPD:8,GRUENE:7,FDP:6,LINKE:11,AfD:26,BSW:null},
+ {date:'27 Jun 2023',inst:'INSA',field:'21–26 Jun 2023',CDU:31,SPD:9,GRUENE:6,FDP:6,LINKE:9,AfD:29,BSW:null},
+ {date:'24 Oct 2023',inst:'INSA',field:'16–23 Oct 2023',CDU:32,SPD:8,GRUENE:5,FDP:4,LINKE:9,AfD:33,BSW:null},
+ {date:'18 Apr 2024',inst:'INSA',field:'10–17 Apr 2024',CDU:32,SPD:8,GRUENE:5,FDP:4,LINKE:5,AfD:29,BSW:10},
+ {date:'13 Jun 2024',inst:'INSA',field:'3–11 Jun 2024',CDU:31,SPD:7,GRUENE:4,FDP:4,LINKE:5,AfD:30,BSW:13},
+ {date:'05 Jul 2024',inst:'INSA',field:'24 Jun–2 Jul 2024',CDU:29,SPD:8,GRUENE:4,FDP:4,LINKE:4,AfD:29,BSW:16},
+ {date:'05 Nov 2024',inst:'INSA',field:'21–28 Oct 2024',CDU:32,SPD:7,GRUENE:3,FDP:4,LINKE:3,AfD:30,BSW:16},
+ {date:'16 Jan 2025',inst:'INSA',field:'8–13 Jan 2025',CDU:32,SPD:8,GRUENE:3,FDP:4,LINKE:4,AfD:31,BSW:14},
+ {date:'19 Jun 2025',inst:'INSA',field:'10–17 Jun 2025',CDU:34,SPD:7,GRUENE:3,FDP:2,LINKE:11,AfD:30,BSW:8},
+ {date:'04 Sep 2025',inst:'Infratest dimap',field:'28 Aug–2 Sep 2025',CDU:27,SPD:7,GRUENE:3,FDP:null,LINKE:13,AfD:39,BSW:6},
+ {date:'15 Oct 2025',inst:'INSA',field:'7–14 Oct 2025',CDU:26,SPD:6,GRUENE:3,FDP:3,LINKE:11,AfD:40,BSW:6},
+ {date:'27 Jan 2026',inst:'INSA',field:'20–27 Jan 2026',CDU:26,SPD:8,GRUENE:3,FDP:2,LINKE:11,AfD:39,BSW:6},
+ {date:'25 Mar 2026',inst:'INSA',field:'17–24 Mar 2026',CDU:25,SPD:6,GRUENE:4,FDP:3,LINKE:13,AfD:38,BSW:5},
+ {date:'07 May 2026',inst:'Infratest dimap',field:'29 Apr–5 May 2026',CDU:26,SPD:7,GRUENE:4,FDP:null,LINKE:12,AfD:41,BSW:4},
+ {date:'13 May 2026',inst:'INSA',field:'5–12 May 2026',CDU:24,SPD:6,GRUENE:4,FDP:3,LINKE:13,AfD:42,BSW:4},
+ {date:'03 Jul 2026',inst:'INSA',field:'23–30 Jun 2026',CDU:23,SPD:6,GRUENE:4,FDP:4,LINKE:13,AfD:41,BSW:5},
+ {date:'23 Jul 2026',inst:'INSA',field:'14–21 Jul 2026',CDU:24,SPD:5,GRUENE:4,FDP:4,LINKE:14,AfD:41,BSW:4},
+ {date:'30 Jul 2026',inst:'Infratest dimap',field:'23–28 Jul 2026',CDU:24,SPD:7,GRUENE:5,FDP:null,LINKE:13,AfD:41,BSW:4},
+ {date:'10 Aug 2026',inst:'INSA',field:'31 Jul–6 Aug 2026',CDU:22,SPD:6,GRUENE:4,FDP:4,LINKE:13,AfD:42,BSW:5},
+ {date:'12 Aug 2026',inst:'pollytix',field:'3–8 Aug 2026',CDU:23,SPD:7,GRUENE:5,FDP:2,LINKE:13,AfD:43,BSW:4},
+ {date:'26 Aug 2026',inst:'Infratest dimap',field:'24–25 Aug 2026',CDU:22,SPD:8,GRUENE:6,FDP:3,LINKE:11,AfD:42,BSW:4},
+ {date:'28 Aug 2026',inst:'FG Wahlen',field:'25–27 Aug 2026',CDU:23,SPD:9,GRUENE:6,FDP:3,LINKE:13,AfD:40,BSW:3},
 ];
 
 function parsePollDate(str) {
@@ -522,54 +524,12 @@ function parsePollDate(str) {
   return new Date(parseInt(year), months[mon], parseInt(day)).getTime();
 }
 
-function parsePollDate(str) {
-  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const [day, mon, year] = str.split(' ');
-  return new Date(parseInt(year), months[mon], parseInt(day)).getTime();
-}
-
-// Simple LOESS (degree-1, tricube-weighted local regression)
-function loess(points, bandwidth = 0.4, evalPoints) {
-  const pts = [...points].sort((a, b) => a.x - b.x);
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-  const n = xs.length;
-  if (n < 2) return evalPoints.map(x => ({ x, y: n ? ys[0] : null }));
-  const k = Math.max(2, Math.ceil(bandwidth * n));
-
-  return evalPoints.map(x0 => {
-    const dists = xs.map(x => Math.abs(x - x0));
-    const h = [...dists].sort((a, b) => a - b)[Math.min(k - 1, n - 1)] || 1;
-    const weights = dists.map(d => {
-      const u = d / h;
-      return u < 1 ? Math.pow(1 - Math.pow(u, 3), 3) : 0;
-    });
-    let sw = 0, swx = 0, swy = 0, swxy = 0, swxx = 0;
-    for (let i = 0; i < n; i++) {
-      const w = weights[i];
-      sw += w; swx += w * xs[i]; swy += w * ys[i];
-      swxy += w * xs[i] * ys[i]; swxx += w * xs[i] * xs[i];
-    }
-    const denom = sw * swxx - swx * swx;
-    let slope = 0, intercept = sw ? swy / sw : ys[0];
-    if (Math.abs(denom) > 1e-9) {
-      slope = (sw * swxy - swx * swy) / denom;
-      intercept = (swy - slope * swx) / sw;
-    }
-    return { x: x0, y: intercept + slope * x0 };
-  });
-}
-
-function hexToRgba(hex, alpha) {
-  const v = hex.replace('#', '');
-  const r = parseInt(v.substring(0, 2), 16);
-  const g = parseInt(v.substring(2, 4), 16);
-  const b = parseInt(v.substring(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
+// Lookup from timestamp -> poll record, used by the tooltip to show pollster + fieldwork period.
+const pollByTimestamp = {};
+polls.forEach(p => { pollByTimestamp[parsePollDate(p.date)] = p; });
 
 const trendMinX = parsePollDate(polls[0].date);
 const trendMaxX = parsePollDate(polls[polls.length - 1].date);
-const trendEvalX = Array.from({ length: 60 }, (_, i) => trendMinX + (i / 59) * (trendMaxX - trendMinX));
 
 const trendPartyKeys = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
 
@@ -584,30 +544,12 @@ const pointDatasets = trendPartyKeys.map(k => ({
   order: 1,
 }));
 
-const trendDatasets = trendPartyKeys.map(k => {
-  const pts = polls.filter(p => p[k] != null).map(p => ({ x: parsePollDate(p.date), y: p[k] }));
-  return {
-    label: PARTIES[k].name + ' (trend)',
-    data: loess(pts, 0.4, trendEvalX),
-    type: 'line',
-    borderColor: hexToRgba(PARTIES[k].color, 0.55),
-    backgroundColor: 'transparent',
-    borderWidth: 2.5,
-    pointRadius: 0,
-    pointHoverRadius: 0,
-    tension: 0.15,
-    fill: false,
-    order: 0,
-    hidden: false,
-  };
-});
-
 new Chart(document.getElementById('trendChart'), {
   type: 'scatter',
   data: { datasets: pointDatasets },
   options: {
     responsive: true,
-      maintainAspectRatio: false,
+    maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: false },
     plugins: {
       legend: {
@@ -615,13 +557,23 @@ new Chart(document.getElementById('trendChart'), {
         labels: {
           boxWidth: 11,
           font: { size: 11 },
-          filter: (item) => !item.text.endsWith('(trend)'), // hide trend entries from legend
         }
       },
       tooltip: {
-        filter: (item) => !item.dataset.label.endsWith('(trend)'), // don't show trend values in tooltip
         callbacks: {
-          title: (items) => items.length ? new Date(items[0].parsed.x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) : '',
+          title: (items) => {
+            if (!items.length) return '';
+            const x = items[0].parsed.x;
+            const poll = pollByTimestamp[x];
+            const dateStr = new Date(x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+            return poll ? `${poll.inst} · ${dateStr}` : dateStr;
+          },
+          afterTitle: (items) => {
+            if (!items.length) return '';
+            const x = items[0].parsed.x;
+            const poll = pollByTimestamp[x];
+            return (poll && poll.field) ? `Fieldwork: ${poll.field}` : '';
+          },
           label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
         }
       }
@@ -642,6 +594,7 @@ new Chart(document.getElementById('trendChart'), {
     }
   }
 });
+
 /* =====================================================================
    GOOGLE SHEETS — live data (turnout / exit polls)
    ===================================================================== */
