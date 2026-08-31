@@ -415,7 +415,7 @@ function fmt(n){return (Math.round(n*10)/10).toString().replace('.0','')+'%';}
 /* ---------- 2021 RESULT BARS ---------- */
 const result2021 = [
   {p:'CDU',v:37.1,s:40},{p:'AfD',v:20.8,s:23},{p:'LINKE',v:11.0,s:12},
-  {p:'SPD',v:8.4,s:9},{p:'FDP',v:6.4,s:7},{p:'GRUENE',v:5.9,s:6},
+  {p:'SPD',v:8.4,s:9},{p:'FDP',v:6.4,s:7},{p:'GRUENE',v:5.9,s:6},{p:'FW',v:3.1,s:0},{p:'Basis',v:1.5,s:0},,{p:'Tierschutz',v:1.4,s:0},{p:'Garten',v:0.8,s:0},{p:'PARTEI',v:0.7,s:0},{p:'Tierschutzallianz',v:0.5.,s:0},
 ];
 const maxV21 = Math.max(...result2021.map(d=>d.v));
 document.getElementById('result2021').innerHTML = result2021.map(d=>{
