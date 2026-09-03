@@ -198,27 +198,10 @@
     <span class="label">Preferred Prime Minister</span>
   </div>
   <div class="card">
-    <h3>If Saxony-Anhalt's regional prime minister were directly elected…</h3>
-    <div class="sub">Direct Election Regional Prime Minister · latest published poll from each pollster</div>
-    <div class="pm-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div>
-        <div class="pm-date">Forschungsgruppe Wahlen · 28 Aug 2026</div>
-        <div class="pm-bar-row"><div class="name" style="color:#3399FF">Schulze (CDU)</div><div class="pm-track"><div class="pm-fill" style="width:48%;background:#3399FF"></div></div><div class="pm-val">48%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:#70463A">Siegmund (AfD)</div><div class="pm-track"><div class="pm-fill" style="width:32%;background:#70463A"></div></div><div class="pm-val">32%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:var(--muted)">None/Don't know</div><div class="pm-track"><div class="pm-fill" style="width:20%;background:#c7c4b8"></div></div><div class="pm-val">20%</div></div>
-      </div>
-      <div>
-        <div class="pm-date">Infratest dimap · 26 Aug 2026</div>
-        <div class="pm-bar-row"><div class="name" style="color:#3399FF">Schulze (CDU)</div><div class="pm-track"><div class="pm-fill" style="width:41%;background:#3399FF"></div></div><div class="pm-val">41%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:#70463A">Siegmund (AfD)</div><div class="pm-track"><div class="pm-fill" style="width:39%;background:#70463A"></div></div><div class="pm-val">39%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:var(--muted)">None/Don't know</div><div class="pm-track"><div class="pm-fill" style="width:20%;background:#c7c4b8"></div></div><div class="pm-val">20%</div></div>
-      </div>
-      <div>
-        <div class="pm-date">INSA · 3 Jul 2026</div>
-        <div class="pm-bar-row"><div class="name" style="color:#3399FF">Schulze (CDU)</div><div class="pm-track"><div class="pm-fill" style="width:28%;background:#3399FF"></div></div><div class="pm-val">28%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:#70463A">Siegmund (AfD)</div><div class="pm-track"><div class="pm-fill" style="width:32%;background:#70463A"></div></div><div class="pm-val">32%</div></div>
-        <div class="pm-bar-row"><div class="name" style="color:var(--muted)">None/Don't know</div><div class="pm-track"><div class="pm-fill" style="width:40%;background:#c7c4b8"></div></div><div class="pm-val">40%</div></div>
-      </div>
+    <h3>Direktwahl Ministerpräsident · if Saxony-Anhalt's regional prime minister were directly elected…</h3>
+    <div class="sub">Every published poll · direct choice between the two lead candidates</div>
+    <div style="height: 400px;">
+      <canvas id="pmTrendChart"></canvas>
     </div>
     <p class="threshold-note">Direct choice between the two lead candidates only — Saxony-Anhalt has no direct election for regional prime minister.</p>
   </div>
@@ -267,6 +250,7 @@
   <div class="card">
     <h3>Saxony-Anhalt 2026 · Turnout by the hour</h3>
     <div class="sub">Cumulative turnout reported through election day, local time</div>
+    <p class="threshold-note" style="margin:-6px 0 14px;">This plot shows how turnout changed by the hour in different elections.</p>
     <div id="turnoutWrap">
       <iframe title="Saxony-Anhalt regional parliament election 2026: Turnout" aria-label="Line chart" id="datawrapper-chart-YC0Gm" src="https://datawrapper.dwcdn.net/YC0Gm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="391" data-external="1"></iframe>
     </div>
@@ -578,6 +562,88 @@ callback: v => new Date(v).toLocaleDateString('en-GB', {day:'2-digit', month:'sh
         grid: { display: false }
       },
       y: { min: 0, max: 46, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#eeece4' } }
+    }
+  }
+});
+
+/* ---------- DIREKTWAHL MINISTERPRÄSIDENT (source: table provided, verbatim) ---------- */
+const pmPolls = [
+ {date:'07.05.2026',inst:'Infratest dimap',Schulze:36,Siegmund:32,None:32},
+ {date:'13.05.2026',inst:'INSA',Schulze:28,Siegmund:30,None:42},
+ {date:'03.07.2026',inst:'INSA',Schulze:28,Siegmund:32,None:40},
+ {date:'26.08.2026',inst:'Infratest dimap',Schulze:41,Siegmund:39,None:20},
+ {date:'28.08.2026',inst:'Forschungsgruppe Wahlen',Schulze:48,Siegmund:32,None:20},
+ {date:'02.09.2026',inst:'INSA',Schulze:28,Siegmund:39,None:33},
+];
+
+function parsePmDate(str){
+  const [day, month, year] = str.split('.');
+  return new Date(parseInt(year), parseInt(month)-1, parseInt(day)).getTime();
+}
+
+const pmByTimestamp = {};
+pmPolls.forEach(p => { pmByTimestamp[parsePmDate(p.date)] = p; });
+
+const pmMinX = parsePmDate(pmPolls[0].date);
+const pmMaxX = parsePmDate(pmPolls[pmPolls.length - 1].date);
+
+const PM_CANDIDATES = {
+  Schulze: {label:'Sven Schulze (CDU)', color:'#3399FF'},
+  Siegmund: {label:'Ulrich Siegmund (AfD)', color:'#70463A'},
+  None: {label:'keiner/weiß nicht', color:'#9aa0a6'},
+};
+
+const pmPointDatasets = Object.keys(PM_CANDIDATES).map(k => ({
+  label: PM_CANDIDATES[k].label,
+  data: pmPolls.filter(p => p[k] != null).map(p => ({ x: parsePmDate(p.date), y: p[k] })),
+  borderColor: PM_CANDIDATES[k].color,
+  backgroundColor: PM_CANDIDATES[k].color,
+  showLine: false,
+  pointRadius: 3.5,
+  pointHoverRadius: 5,
+}));
+
+new Chart(document.getElementById('pmTrendChart'), {
+  type: 'scatter',
+  data: { datasets: pmPointDatasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 11,
+          font: { size: 11 },
+        }
+      },
+      tooltip: {
+        callbacks: {
+          title: (items) => {
+            if (!items.length) return '';
+            const x = items[0].parsed.x;
+            const poll = pmByTimestamp[x];
+            const dateStr = new Date(x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+            return poll ? `${poll.inst} · ${dateStr}` : dateStr;
+          },
+          label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
+        }
+      }
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        min: pmMinX,
+        max: pmMaxX,
+        ticks: {
+          maxTicksLimit: 8,
+          font: { size: 9.5 },
+          callback: v => new Date(v).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})
+        },
+        grid: { display: false }
+      },
+      y: { min: 0, max: 55, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: '#eeece4' } }
     }
   }
 });
