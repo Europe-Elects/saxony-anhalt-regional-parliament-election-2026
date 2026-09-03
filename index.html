@@ -113,6 +113,13 @@
   .placeholder a{color:var(--navy);font-weight:600;}
   .sheet-link{font-size:11px;color:var(--muted);margin-top:6px;display:inline-block;}
 
+  /* ===== demographic-trend controls (Job/Age/Gender/Education selector) ===== */
+  .demo-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .demo-controls label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .demo-controls select{font-family:inherit;font-size:14px;font-weight:600;color:var(--text);background:#faf9f5;border:1px solid var(--border);border-radius:6px;padding:8px 10px;min-width:170px;cursor:pointer;}
+  .demo-controls select:focus-visible{outline:2px solid var(--navy);outline-offset:1px;}
+  .demo-note{font-size:11.5px;color:var(--muted);margin-top:10px;}
+
   canvas{max-width:100%;}
 
   footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);}
@@ -126,6 +133,7 @@
     .pm-grid{grid-template-columns:1fr;}
     table{font-size:11px;}
     th,td{padding:6px 3px;}
+    .demo-controls select{min-width:140px;}
   }
   @media (max-width:420px){.cand-grid{grid-template-columns:1fr;}}
 </style>
@@ -212,36 +220,21 @@
   </div>
 
   <div class="card">
-    <h3>By gender</h3>
-    <div class="sub">Second vote (Zweitstimme) · Statistisches Landesamt Sachsen-Anhalt, representative election statistics</div>
-    <table id="demoGenderTable"></table>
+    <h3>Vote share by group, election over election</h3>
+    <div class="sub">Second vote (Zweitstimme) · Infratest dimap im Auftrag der ARD, Wahltagsbefragungen 1998–2021</div>
+    <div class="demo-controls">
+      <label for="demoCategorySelect">Group
+        <select id="demoCategorySelect"></select>
+      </label>
+      <label for="demoSubgroupSelect">Subgroup
+        <select id="demoSubgroupSelect"></select>
+      </label>
+    </div>
+    <div style="height: 380px;">
+      <canvas id="demoTrendChart"></canvas>
+    </div>
+    <p class="demo-note" id="demoNote"></p>
   </div>
-
-  <div class="card">
-    <h3>By age group</h3>
-    <div class="sub">Second vote (Zweitstimme) · Statistisches Landesamt Sachsen-Anhalt, representative election statistics</div>
-    <table id="demoAgeTable"></table>
-  </div>
-
-  <div class="card">
-    <h3>By education</h3>
-    <div class="sub">Hauptschulabschluss / Mittlere Reife / Hochschulreife / Hochschulabschluss</div>
-    <table id="demoEduTable"></table>
-    <p class="threshold-note">Hauptschulabschluss and Mittlere Reife rows are awaiting confirmed 2021 source figures.</p>
-  </div>
-
-  <div class="card">
-    <h3>By professional group</h3>
-    <div class="sub">Workers / Employees / Civil Servants / Pensioners / Unemployed</div>
-    <table id="demoJobTable"></table>
-  </div>
-
-  <div class="card">
-    <h3>By rural / urban</h3>
-    <div class="sub">Urban / Rural</div>
-    <table id="demoRuralTable"></table>
-  </div>
-
 
   <!-- ============ ELECTION DAY BLOCK ============ -->
   <div id="electionday" class="callout">
@@ -374,6 +367,8 @@ const PARTIES = {
   TSA:    {name:'Tierschutzallianz', full:'Allianz für Menschenrechte, Tier- und Naturschutz', family:'Animal rights', euro:'None (*)', color:'#00a68c', dark:false},
   PDF:    {name:'PdF',    full:'Partei des Fortschritts',               family:'Digital democracy',     euro:'EDP (RE)', color:'#fa8c00', dark:false},
   VOLT:   {name:'Volt',   full:'Volt Deutschland',                      family:'Eurofederalist',        euro:'Volt (Greens/EFA)', color:'#502379', dark:false},
+  SCHILL: {name:'Schill', full:'Partei Rechtsstaatlicher Offensive',    family:'Right-wing populist',   euro:'—',     color:'#6a4fa0', dark:false},
+  NPD:    {name:'NPD',    full:'Nationaldemokratische Partei Deutschlands', family:'Far-right',          euro:'—',     color:'#4a3728', dark:false},
   OTHERS: {name:'Others', full:'Others',                                family:'—',                     euro:'—',    color:'#c7c4b8', dark:true},
 };
 function textColor(p){return p.dark ? '#1c1e22' : '#ffffff';}
@@ -394,71 +389,92 @@ document.getElementById('result2021').innerHTML = result2021.map(d=>{
   </div>`;
 }).join('');
 
-/* ---------- DEMOGRAPHIC VOTE (2021 vs 2026, with change) ---------- */
-const demoParties = ['CDU','AfD','LINKE','SPD','GRUENE','FDP','BSW'];
+/* ---------- DEMOGRAPHIC VOTE OVER TIME (Infratest dimap / ARD Wahltagsbefragungen) ----------
+   DEMO_TREND holds, per Group (Gender/Age/Education/Job) and Subgroup, a per-party series of
+   {electionYear: voteSharePercent}. Years without a fielded breakdown for that subgroup are
+   simply absent from the series — Chart.js is told to skip the gaps rather than interpolate
+   across elections where the group wasn't asked about. */
+const DEMO_TREND = {"data":{"Gender":{"Men":{"CDU":{"2011":31,"2016":27,"2021":33},"AfD":{"2016":27,"2021":26},"LINKE":{"2011":25,"2016":16,"2021":11},"SPD":{"2011":21,"2016":11,"2021":8},"GRUENE":{"2011":6,"2016":5,"2021":6},"FDP":{"2011":3,"2016":5,"2021":7},"NPD":{"2011":7}},"Women":{"CDU":{"2011":34,"2016":33,"2021":41},"AfD":{"2016":18,"2021":16},"LINKE":{"2011":22,"2016":17,"2021":11},"SPD":{"2011":22,"2016":12,"2021":8},"GRUENE":{"2011":8,"2016":6,"2021":6},"FDP":{"2011":4,"2016":5,"2021":6},"NPD":{"2011":3}}},"Age":{"18–25":{"CDU":{"1998":13,"2002":31,"2006":27,"2011":24,"2016":15,"2021":18},"AfD":{"2021":17},"LINKE":{"1998":17,"2002":20,"2006":18,"2011":17,"2016":13,"2021":11},"SPD":{"1998":23,"2002":14,"2006":21,"2011":16,"2016":11,"2021":6},"GRUENE":{"1998":6,"2002":4,"2006":6,"2011":9,"2016":10,"2021":15},"FDP":{"1998":4,"2002":20,"2006":9,"2011":4,"2016":5,"2021":12},"SCHILL":{"2002":6}},"25–35":{"CDU":{"1998":25,"2002":37,"2006":31,"2011":30,"2016":22,"2021":22},"AfD":{"2021":28},"LINKE":{"1998":21,"2002":17,"2006":19,"2011":17,"2016":10,"2021":9},"SPD":{"1998":29,"2002":12,"2006":17,"2011":16,"2016":10,"2021":6},"GRUENE":{"1998":5,"2002":3,"2006":6,"2011":11,"2016":7,"2021":11},"FDP":{"1998":5,"2002":19,"2006":10,"2011":5,"2016":4,"2021":6},"SCHILL":{"2002":7}},"35–45":{"CDU":{"1998":20,"2002":40,"2006":34,"2011":31,"2016":26,"2021":29},"AfD":{"2021":28},"LINKE":{"1998":21,"2002":18,"2006":23,"2011":20,"2016":12,"2021":8},"SPD":{"1998":30,"2002":14,"2006":18,"2011":18,"2016":10,"2021":6},"GRUENE":{"1998":4,"2002":3,"2006":5,"2011":11,"2016":7,"2021":8},"FDP":{"1998":4,"2002":15,"2006":7,"2011":4,"2016":5,"2021":8},"SCHILL":{"2002":7}},"45–60":{"CDU":{"1998":22,"2002":38,"2006":36,"2011":32,"2016":28,"2021":35},"AfD":{"2021":26},"LINKE":{"1998":19,"2002":22,"2006":28,"2011":27,"2016":15,"2021":10},"SPD":{"1998":38,"2002":19,"2006":20,"2011":18,"2016":9,"2021":7},"GRUENE":{"1998":3,"2002":2,"2006":3,"2011":7,"2016":5,"2021":6},"FDP":{"1998":4,"2002":13,"2006":6,"2011":4,"2016":5,"2021":7},"SCHILL":{"2002":5}},"60–70":{"CDU":{"2016":31,"2021":43},"AfD":{"2021":19},"LINKE":{"2016":21,"2021":13},"SPD":{"2016":12,"2021":8},"GRUENE":{"2016":4,"2021":4},"FDP":{"2016":5,"2021":6}},"60+":{"SCHILL":{"2002":2},"CDU":{"1998":27,"2002":36,"2006":41,"2011":35},"LINKE":{"1998":20,"2002":22,"2006":24,"2011":25},"SPD":{"1998":43,"2002":29,"2006":25,"2011":27},"GRUENE":{"1998":2,"2002":1,"2006":2,"2011":4},"FDP":{"1998":4,"2002":10,"2006":5,"2011":3}},"70+":{"CDU":{"2016":39,"2021":49},"AfD":{"2021":11},"LINKE":{"2016":20,"2021":14},"SPD":{"2016":16,"2021":13},"GRUENE":{"2016":3,"2021":3},"FDP":{"2016":4,"2021":5}}},"Education":{"Low formal":{"CDU":{"2016":29,"2021":41},"AfD":{"2016":24,"2021":26},"LINKE":{"2016":19,"2021":11},"SPD":{"2016":13,"2021":10},"GRUENE":{"2016":2,"2021":3},"FDP":{"2016":4,"2021":3}},"High formal":{"CDU":{"2016":32,"2021":34},"AfD":{"2016":15,"2021":13},"LINKE":{"2016":18,"2021":14},"SPD":{"2016":13,"2021":9},"GRUENE":{"2016":9,"2021":11},"FDP":{"2016":7,"2021":8}}},"Job":{"Worker":{"CDU":{"2002":41,"2006":34,"2011":27,"2016":20,"2021":29},"AfD":{"2016":35,"2021":35},"LINKE":{"2002":17,"2006":24,"2011":25,"2016":14,"2021":11},"SPD":{"2002":16,"2006":19,"2011":20,"2016":10,"2021":8},"GRUENE":{"2002":1,"2006":4,"2011":6,"2016":5,"2021":2},"FDP":{"2002":13,"2006":6,"2011":3,"2016":3,"2021":5},"NPD":{"2011":11},"SCHILL":{"2002":9}},"Employee":{"CDU":{"1998":23,"2002":39,"2006":41,"2011":34,"2016":29,"2021":33},"AfD":{"2016":21,"2021":23},"LINKE":{"1998":22,"2002":21,"2006":22,"2011":22,"2016":15,"2021":9},"SPD":{"1998":33,"2002":16,"2006":19,"2011":19,"2016":10,"2021":7},"GRUENE":{"1998":5,"2002":3,"2006":4,"2011":10,"2016":7,"2021":8},"FDP":{"1998":5,"2002":15,"2006":7,"2011":3,"2016":6,"2021":7},"SCHILL":{"2002":4}},"Self-employed":{"CDU":{"1998":33,"2002":44,"2006":53,"2011":49,"2016":38,"2021":34},"AfD":{"2016":22,"2021":24},"LINKE":{"1998":17,"2002":15,"2006":14,"2011":15,"2016":9,"2021":7},"SPD":{"1998":20,"2002":9,"2006":10,"2011":9,"2016":8,"2021":4},"GRUENE":{"1998":5,"2002":3,"2006":6,"2011":6,"2016":9,"2021":10},"FDP":{"1998":9,"2002":22,"2006":14,"2011":11,"2016":6,"2021":7}},"Pensioner":{"CDU":{"1998":25,"2002":35,"2006":38,"2011":33,"2016":35,"2021":47},"AfD":{"2016":18,"2021":13},"LINKE":{"1998":20,"2002":22,"2006":26,"2011":26,"2016":23,"2021":15},"SPD":{"1998":44,"2002":29,"2006":25,"2011":28,"2016":13,"2021":4},"GRUENE":{"1998":2,"2002":1,"2006":2,"2011":3,"2016":2,"2021":4},"FDP":{"1998":4,"2002":9,"2006":6,"2011":3,"2016":10,"2021":11},"SCHILL":{"2002":2}},"Unemployed":{"CDU":{"1998":17,"2002":31,"2006":23,"2011":15,"2016":14,"2021":34},"AfD":{"2011":15,"2016":36,"2021":24},"LINKE":{"1998":22,"2002":25,"2006":32,"2011":35,"2016":16,"2021":7},"SPD":{"1998":34,"2002":18,"2006":20,"2011":19,"2016":12,"2021":11},"GRUENE":{"1998":3,"2002":2,"2006":4,"2011":8,"2016":2,"2021":6},"FDP":{"1998":3,"2002":13,"2006":6,"2011":3,"2016":2,"2021":4},"NPD":{"2011":9},"SCHILL":{"2002":7}}}},"order":{"Gender":["Men","Women"],"Age":["18–25","25–35","35–45","45–60","60–70","60+","70+"],"Education":["Low formal","High formal"],"Job":["Worker","Employee","Self-employed","Pensioner","Unemployed"]},"years":["1990","1994","1998","2002","2006","2011","2016","2021","2026"]};
 
-// Renders a table: Group | Party | 2021 | 2026 | Change
-// data2021/data2026 are {subgroupLabel: {CDU:.., AfD:.., ...}}; pass null/{} for data2026 to mark it pending
-function renderDemoTable(elId, subgroups, data2021, data2026){
-  let rows = '';
-  subgroups.forEach(label=>{
-    const v21 = data2021[label] || {};
-    const v26 = (data2026 && data2026[label]) || {};
-    demoParties.forEach((k,i)=>{
-      const meta = PARTIES[k];
-      const a = v21[k], b = v26[k];
-      const change = (a!=null && b!=null) ? (Math.round((b-a)*10)/10) : null;
-      rows += `<tr>
-        ${i===0 ? `<td rowspan="${demoParties.length}" style="vertical-align:top;font-weight:700;border-right:1px solid var(--border)">${label}</td>` : ''}
-        <td style="text-align:left;color:${meta.color==='#FFD700'?'#a68a00':meta.color};font-weight:700">${meta.name}</td>
-        <td>${a!=null ? fmt(a) : '—'}</td>
-        <td style="color:var(--muted)">${b!=null ? fmt(b) : 'pending'}</td>
-        <td style="color:${change==null?'var(--muted)':(change>=0?'var(--green)':'var(--red)')}">${change==null ? 'pending' : (change>0?'+':'')+change}</td>
-      </tr>`;
-    });
-  });
-  document.getElementById(elId).innerHTML = `
-    <thead><tr><th>Group</th><th>Party</th><th>2021</th><th>2026</th><th>Change</th></tr></thead>
-    <tbody>${rows}</tbody>
-  `;
+const DEMO_LABELS = {
+  Gender: 'Gender', Age: 'Age group', Education: 'Education', Job: 'Professional group',
+};
+const DEMO_SOURCE_NOTE = {
+  Gender: 'Breakdown by gender was first fielded by Infratest dimap for Sachsen-Anhalt in 2011; no comparable figures exist for 1990–2006.',
+  Age: 'Age-group breakdowns exist back to 1998; the youngest and oldest bands were re-cut (60+ split into 60–70/70+) from 2016 onward, so those two bands only have two data points.',
+  Education: 'Education breakdowns were only fielded in 2016 and 2021; earlier surveys used different or unpublished categories.',
+  Job: 'Professional-group breakdowns exist back to 1998 for most categories (2002 for workers); the self-employed group has no reported AfD share before 2016 because Infratest dimap did not separately publish it.',
+};
+
+let demoChart = null;
+
+function populateDemoSelectors(){
+  const catSelect = document.getElementById('demoCategorySelect');
+  const subSelect = document.getElementById('demoSubgroupSelect');
+  const categories = Object.keys(DEMO_TREND.order);
+  catSelect.innerHTML = categories.map(c=>`<option value="${c}">${DEMO_LABELS[c]||c}</option>`).join('');
+  catSelect.value = 'Job';
+  populateSubgroups();
+  catSelect.addEventListener('change', ()=>{ populateSubgroups(); renderDemoChart(); });
+  subSelect.addEventListener('change', renderDemoChart);
+}
+function populateSubgroups(){
+  const cat = document.getElementById('demoCategorySelect').value;
+  const subSelect = document.getElementById('demoSubgroupSelect');
+  const subs = DEMO_TREND.order[cat];
+  subSelect.innerHTML = subs.map(s=>`<option value="${s}">${s}</option>`).join('');
 }
 
-const demoGender2021 = {
-  'Men': {CDU:33, AfD:26, LINKE:11, SPD:8, GRUENE:6, FDP:7, BSW:null},
-  'Women': {CDU:41, AfD:16, LINKE:11, SPD:8, GRUENE:6, FDP:6, BSW:null},
-};
-renderDemoTable('demoGenderTable', ['Men','Women'], demoGender2021, null);
+function renderDemoChart(){
+  const cat = document.getElementById('demoCategorySelect').value;
+  const sub = document.getElementById('demoSubgroupSelect').value;
+  const seriesByParty = DEMO_TREND.data[cat][sub];
+  const years = DEMO_TREND.years.filter(y => y !== '2026'); // no fielded 2026 breakdown yet
 
-const demoAge2021 = {
-  '18–25': {CDU:18, AfD:17, LINKE:11,  SPD:6,  GRUENE:15, FDP:12, BSW:null},
-  '25–35': {CDU:22, AfD:28, LINKE:9,  SPD:6,  GRUENE:11, FDP:6,  BSW:null},
-  '35–45': {CDU:29, AfD:28, LINKE:8,  SPD:6,  GRUENE:8, FDP:8,  BSW:null},
-  '45–60': {CDU:35, AfD:26, LINKE:10,  SPD:7,  GRUENE:6, FDP:7,  BSW:null},
-  '60–70': {CDU:43, AfD:19, LINKE:13, SPD:8,  GRUENE:4, FDP:6,  BSW:null},
-  '70+':   {CDU:49, AfD:11, LINKE:14, SPD:13, GRUENE:3, FDP:5,  BSW:null},
-};
-renderDemoTable('demoAgeTable', ['18–25','25–35','35–45','45–60','60–70','70+'], demoAge2021, null);
+  // Only plot parties that actually have at least one point for this subgroup,
+  // ordered to roughly match the party's real-world prominence in the dataset.
+  const partyOrder = ['CDU','AfD','LINKE','SPD','GRUENE','FDP','SCHILL','NPD'];
+  const partyKeys = partyOrder.filter(k => seriesByParty[k]);
 
-// Education: Hochschulreife/Hochschulabschluss are real 2021 figures (Forschungsgruppe Wahlen
-// exit poll, via KAS Wahlanalyse); Hauptschulabschluss/Mittlere Reife are awaiting confirmed source data.
-const demoEdu2021 = {
-  'Basic Education': {CDU:41, AfD:26, LINKE:11, SPD:10, GRUENE:3, FDP:3, BSW:null},
-  'Higher Education': {CDU:34, AfD:13, LINKE:14, SPD:9, GRUENE:11, FDP:8, BSW:null},
-};
-renderDemoTable('demoEduTable', ['Hauptschulabschluss','Mittlere Reife','Hochschulreife','Hochschulabschluss'], demoEdu2021, null);
+  const datasets = partyKeys.map(k=>{
+    const meta = PARTIES[k];
+    return {
+      label: meta.name,
+      data: years.map(y => seriesByParty[k][y] ?? null),
+      borderColor: meta.color,
+      backgroundColor: meta.color,
+      spanGaps: false,
+      pointRadius: years.map(y => seriesByParty[k][y] != null ? 4 : 0),
+      pointHoverRadius: 6,
+      borderWidth: 2.5,
+      tension: 0.2,
+    };
+  });
 
-// Professional group and rural/urban: awaiting confirmed 2021 source data.
-const demoJob2021 = {
-  'Workers': {CDU:29, AfD:35, LINKE:11, SPD:8, GRUENE:2, FDP:5, BSW:null}, 
-  'Employees': {CDU:33, AfD:23, LINKE:9, SPD:7, GRUENE:8, FDP:7, BSW:null}, 
-  'Civil Servants': {CDU:34, AfD:24, LINKE:7, SPD:4, GRUENE:10, FDP:11, BSW:null}, 
-  'Pensioners': {CDU:47, AfD:13, LINKE:15, SPD:11, GRUENE:4, FDP:5, BSW:null},
-  'Unemployment': {CDU:19, AfD:38, LINKE:15, SPD:8, GRUENE:6, FDP:4, BSW:null},
-};
-renderDemoTable('demoJobTable', ['Arbeiter','Angestellte','Beamte','Selbstständige','Rentner','Arbeitslose'], demoJob2021, null);
+  if(demoChart) demoChart.destroy();
+  demoChart = new Chart(document.getElementById('demoTrendChart'), {
+    type: 'line',
+    data: { labels: years, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 11 } } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.parsed.y!=null ? ctx.parsed.y+'%' : 'not fielded') } },
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { min: 0, max: 55, ticks: { callback: v => v+'%' }, grid: { color: '#eeece4' } },
+      },
+    },
+  });
 
-const demoRural2021 = { 'Urban': {}, 'Rural': {} };
-renderDemoTable('demoRuralTable', ['Urban','Rural'], demoRural2021, null);
+  document.getElementById('demoNote').textContent = DEMO_SOURCE_NOTE[cat] || '';
+}
+
+populateDemoSelectors();
+renderDemoChart();
 
 /* ---------- POLL CHRONICLE (source: table provided, verbatim) ---------- */
 const polls = [
