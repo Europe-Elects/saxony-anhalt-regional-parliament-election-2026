@@ -669,8 +669,8 @@ async function renderTurnout(){
     const header = rows[0];
     const body = rows.slice(1).filter(r=>r[0]);
 
-    const labels = header.slice(1);           // time-of-day labels, e.g. '08:00', '09:00', ...
-    const seriesNames = body.map(r=>r[0]);     // one series per year, e.g. '2026', '2021', ...
+    const labels = header.slice(1);
+    const seriesNames = body.map(r=>r[0]);
     const palette = ['#1a2b4a','#70463A','#3399FF','#009900','#990000','#FFD700'];
 
     el.innerHTML = `<canvas id="turnoutChart" height="220"></canvas>`;
@@ -678,13 +678,23 @@ async function renderTurnout(){
       type:'line',
       data:{
         labels,
-        datasets: body.map((row, i) => ({
-          label: seriesNames[i],
-          data: row.slice(1).map(v => parseFloat((v||'').replace('%','')) || null),
-          borderColor: palette[i % palette.length],
-          backgroundColor: palette[i % palette.length],
-          spanGaps: true, pointRadius: 2, borderWidth: 2, tension: 0.2,
-        }))
+        datasets: body.map((row, i) => {
+          const isCurrentYear = seriesNames[i].trim() === '2026';
+          return {
+            label: seriesNames[i],
+            data: row.slice(1).map(v => parseFloat((v||'').replace('%','')) || null),
+            borderColor: palette[i % palette.length],
+            backgroundColor: palette[i % palette.length],
+            spanGaps: true,
+            borderWidth: isCurrentYear ? 3 : 2,
+            tension: 0.2,
+            pointRadius: isCurrentYear ? 6 : 2,
+            pointHoverRadius: isCurrentYear ? 8 : 4,
+            pointStyle: isCurrentYear ? 'rectRot' : 'circle',
+            pointBorderColor: isCurrentYear ? '#fff' : palette[i % palette.length],
+            pointBorderWidth: isCurrentYear ? 2 : 1,
+          };
+        })
       },
       options:{
         responsive:true,
