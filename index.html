@@ -229,10 +229,21 @@
     <span class="label">Coalition Options</span>
   </div>
   <div class="card">
-    <h3>Forschungsgruppe Wahlen · possible coalition combinations</h3>
-    <div class="sub">Combined seat/vote share of viable coalition options, per the latest Forschungsgruppe Wahlen breakdown</div>
-    <div class="iframe-embed">
-      <iframe title="Saxony Anhalt: 2026 Coalition Options Forschungsgruppe Wahlen" aria-label="Stacked Bars" id="datawrapper-chart-k247d" src="https://datawrapper.dwcdn.net/k247d/1/" scrolling="no" frameborder="0" height="208" data-external="1"></iframe>
+    <h3>Possible coalition combinations</h3>
+    <div class="sub">Combined seat/vote share of viable coalition options, per the latest Infratest dimap and Forschungsgruppe Wahlen breakdowns</div>
+    <div class="embed-row">
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap</div>
+        <div class="iframe-embed">
+          <iframe title="Saxony Anhalt: 2026 Coalition Options Infratest dimap" aria-label="Stacked Bars" id="datawrapper-chart-TviGe" src="https://datawrapper.dwcdn.net/TviGe/1/" scrolling="no" frameborder="0" height="207" data-external="1"></iframe>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen</div>
+        <div class="iframe-embed">
+          <iframe title="Saxony Anhalt: 2026 Coalition Options Forschungsgruppe Wahlen" aria-label="Stacked Bars" id="datawrapper-chart-k247d" src="https://datawrapper.dwcdn.net/k247d/1/" scrolling="no" frameborder="0" height="208" data-external="1"></iframe>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -241,21 +252,39 @@
     <span class="label">Demographic Vote</span>
   </div>
 
-  <div class="card">
-    <h3>Vote share by group, election over election</h3>
-    <div class="sub">Second vote (Zweitstimme) · Infratest dimap im Auftrag der ARD, Wahltagsbefragungen 1998–2021</div>
-    <div class="demo-controls">
-      <label for="demoCategorySelect">Group
-        <select id="demoCategorySelect"></select>
-      </label>
-      <label for="demoSubgroupSelect">Subgroup
-        <select id="demoSubgroupSelect"></select>
-      </label>
+  <div class="embed-row">
+    <div class="card">
+      <h3>Vote share by group, election over election</h3>
+      <div class="sub">Second vote (Zweitstimme) · Infratest dimap im Auftrag der ARD, Wahltagsbefragungen 1998–2021</div>
+      <div class="demo-controls">
+        <label for="demoCategorySelect1">Group
+          <select id="demoCategorySelect1"></select>
+        </label>
+        <label for="demoSubgroupSelect1">Subgroup
+          <select id="demoSubgroupSelect1"></select>
+        </label>
+      </div>
+      <div style="height: 380px;">
+        <canvas id="demoTrendChart1"></canvas>
+      </div>
+      <p class="demo-note" id="demoNote1"></p>
     </div>
-    <div style="height: 380px;">
-      <canvas id="demoTrendChart"></canvas>
+    <div class="card">
+      <h3>Vote share by group, election over election</h3>
+      <div class="sub">Second vote (Zweitstimme) · Infratest dimap im Auftrag der ARD, Wahltagsbefragungen 1998–2021</div>
+      <div class="demo-controls">
+        <label for="demoCategorySelect2">Group
+          <select id="demoCategorySelect2"></select>
+        </label>
+        <label for="demoSubgroupSelect2">Subgroup
+          <select id="demoSubgroupSelect2"></select>
+        </label>
+      </div>
+      <div style="height: 380px;">
+        <canvas id="demoTrendChart2"></canvas>
+      </div>
+      <p class="demo-note" id="demoNote2"></p>
     </div>
-    <p class="demo-note" id="demoNote"></p>
   </div>
 
   <!-- ============ ELECTION DAY BLOCK ============ -->
@@ -314,13 +343,6 @@
       </div>
     </div>
     <p class="threshold-note">Forschungsgruppe Wahlen has published only one full-breakdown Sachsen-Anhalt poll so far this cycle, shown as a single point.</p>
-  </div>
-
-  <div class="card">
-    <h3>Hochrechnung · running election-night projection</h3>
-    <div class="sub">Updated every few minutes on election night, 6 September 2026 · second vote (Zweitstimme)</div>
-    <table id="hochrechnungTable"></table>
-    <p class="threshold-note">No Hochrechnung published yet — this table is refreshed manually as new projections come in after polls close at 18:00 CEST.</p>
   </div>
 
   <!-- RESULTS -->
@@ -413,7 +435,7 @@ const PARTIES = {
   TSA:    {name:'Tierschutzallianz', full:'Allianz für Menschenrechte, Tier- und Naturschutz', family:'Animal rights', euro:'None (*)', color:'#00a68c', dark:false},
   PDF:    {name:'PdF',    full:'Partei des Fortschritts',               family:'Digital democracy',     euro:'EDP (RE)', color:'#fa8c00', dark:false},
   VOLT:   {name:'Volt',   full:'Volt Deutschland',                      family:'Eurofederalist',        euro:'Volt (Greens/EFA)', color:'#502379', dark:false},
-  SCHILL: {name:'Schill', full:'Partei Rechtsstaatlicher Offensive',    family:'Right-wing populist',   euro:'—',     color:'#6a4fa0', dark:false},
+  SCHILL: {name:'Schill (*)', full:'Partei Rechtsstaatlicher Offensive',    family:'Right-wing populist',   euro:'—',     color:'#6a4fa0', dark:false},
   NPD:    {name:'NPD',    full:'Nationaldemokratische Partei Deutschlands', family:'Far-right',          euro:'—',     color:'#4a3728', dark:false},
   DVU:    {name:'DVU',    full:'Deutsche Volksunion',                   family:'Far-right',             euro:'—',     color:'#5c4a3c', dark:false},
   OTHERS: {name:'Others', full:'Others',                                family:'—',                     euro:'—',    color:'#c7c4b8', dark:true},
@@ -453,30 +475,30 @@ const DEMO_SOURCE_NOTE = {
   Job: 'Professional-group breakdowns exist back to 1998 for most categories (2002 for workers); the self-employed group has no reported AfD share before 2016 because Infratest dimap did not separately publish it.',
 };
 
-let demoChart = null;
+const demoCharts = {};
 
-function populateDemoSelectors(){
-  const catSelect = document.getElementById('demoCategorySelect');
-  const subSelect = document.getElementById('demoSubgroupSelect');
+function populateDemoSelectors(suffix, defaultCategory){
+  const catSelect = document.getElementById('demoCategorySelect'+suffix);
+  const subSelect = document.getElementById('demoSubgroupSelect'+suffix);
   const categories = Object.keys(DEMO_TREND.order);
   catSelect.innerHTML = categories.map(c=>`<option value="${c}">${DEMO_LABELS[c]||c}</option>`).join('');
-  catSelect.value = 'Job';
-  populateSubgroups();
-  catSelect.addEventListener('change', ()=>{ populateSubgroups(); renderDemoChart(); });
-  subSelect.addEventListener('change', renderDemoChart);
+  catSelect.value = defaultCategory;
+  populateSubgroups(suffix);
+  catSelect.addEventListener('change', ()=>{ populateSubgroups(suffix); renderDemoChart(suffix); });
+  subSelect.addEventListener('change', ()=>renderDemoChart(suffix));
 }
-function populateSubgroups(){
-  const cat = document.getElementById('demoCategorySelect').value;
-  const subSelect = document.getElementById('demoSubgroupSelect');
+function populateSubgroups(suffix){
+  const cat = document.getElementById('demoCategorySelect'+suffix).value;
+  const subSelect = document.getElementById('demoSubgroupSelect'+suffix);
   const subs = DEMO_TREND.order[cat];
   subSelect.innerHTML = subs.map(s=>`<option value="${s}">${s}</option>`).join('');
 }
 
-function renderDemoChart(){
-  const cat = document.getElementById('demoCategorySelect').value;
-  const sub = document.getElementById('demoSubgroupSelect').value;
+function renderDemoChart(suffix){
+  const cat = document.getElementById('demoCategorySelect'+suffix).value;
+  const sub = document.getElementById('demoSubgroupSelect'+suffix).value;
   const seriesByParty = DEMO_TREND.data[cat][sub];
-  const years = DEMO_TREND.years.filter(y => y !== '2026'); // no fielded 2026 breakdown yet
+  const years = DEMO_TREND.years; // 2026 included as an empty slot, filled in on election day
 
   // Only plot parties that actually have at least one point for this subgroup,
   // ordered to roughly match the party's real-world prominence in the dataset.
@@ -498,8 +520,8 @@ function renderDemoChart(){
     };
   });
 
-  if(demoChart) demoChart.destroy();
-  demoChart = new Chart(document.getElementById('demoTrendChart'), {
+  if(demoCharts[suffix]) demoCharts[suffix].destroy();
+  demoCharts[suffix] = new Chart(document.getElementById('demoTrendChart'+suffix), {
     type: 'line',
     data: { labels: years, datasets },
     options: {
@@ -517,11 +539,13 @@ function renderDemoChart(){
     },
   });
 
-  document.getElementById('demoNote').textContent = DEMO_SOURCE_NOTE[cat] || '';
+  document.getElementById('demoNote'+suffix).textContent = DEMO_SOURCE_NOTE[cat] || '';
 }
 
-populateDemoSelectors();
-renderDemoChart();
+populateDemoSelectors('1', 'Job');
+renderDemoChart('1');
+populateDemoSelectors('2', 'Age');
+renderDemoChart('2');
 
 /* ---------- POLL CHRONICLE (source: table provided, verbatim) ---------- */
 const polls = [
@@ -790,7 +814,7 @@ async function renderExitVotes(){
       type:'bar',
       data:{ labels, datasets: seriesNames.map((name,i)=>({
         label:name, data: body.map(r=>parseFloat((r[i+1]||'').replace('%',''))||0),
-        backgroundColor: seriesNames.length>1 ? undefined : barColors,
+        backgroundColor: barColors,
         borderRadius:3,
       })) },
       options:{responsive:true, plugins:{legend:{display:seriesNames.length>1,position:'bottom'}},
@@ -815,7 +839,7 @@ async function renderExitSeats(){
       type:'bar',
       data:{ labels, datasets: seriesNames.map((name,i)=>({
         label:name, data: body.map(r=>parseFloat(r[i+1])||0),
-        backgroundColor: seriesNames.length>1 ? undefined : barColors,
+        backgroundColor: barColors,
         borderRadius:3,
       })) },
       options:{responsive:true, plugins:{legend:{display:seriesNames.length>1,position:'bottom'}},
@@ -826,26 +850,6 @@ async function renderExitSeats(){
   }
 }
 renderExitVotes(); renderExitSeats();
-
-/* ---------- HOCHRECHNUNG: manually-updated running election-night table ----------
-   Add entries here (in chronological order) as new Hochrechnungen are published;
-   each row's parties should sum to roughly 100%. Re-run renderHochrechnungTable()
-   is automatic on load. */
-const projParties = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW'];
-const hochrechnung = [
-  // { time:'20:15', AfD:null, CDU:null, LINKE:null, SPD:null, GRUENE:null, FDP:null, BSW:null },
-];
-function renderHochrechnungTable(){
-  const el = document.getElementById('hochrechnungTable');
-  el.innerHTML = `<thead><tr><th>Time</th>${projParties.map(k=>`<th>${PARTIES[k].name}</th>`).join('')}</tr></thead>
-    <tbody>
-      ${hochrechnung.map(r=>`<tr>
-        <td class="inst">${r.time}</td>
-        ${projParties.map(k=>`<td style="color:${PARTIES[k].color==='#FFD700'?'#a68a00':PARTIES[k].color};font-weight:700">${r[k]!=null? (r[k]+'%'):'–'}</td>`).join('')}
-      </tr>`).join('')}
-    </tbody>`;
-}
-renderHochrechnungTable();
 
 /* ---------- RESULTS: all 15 contesting parties ---------- */
 const contestants = [
