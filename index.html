@@ -812,62 +812,65 @@ async function getExitVoteFor(partyKey, institute){
   return parseNum(row[colIdx]);
 }
 
-/* Exit poll votes: col0 = party, cols1..n = source columns (%) */
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+/* One chart per institute, side by side — same layout as the Projections section.
+   All institutes share one y-axis maximum so the two charts stay comparable. */
+const exitCharts = {};
+function renderExitCharts(el, rows, cfg){
+  const header = rows[0];                                     // ["", "CDU", "AfD", "Linke", ...]
+  const body = rows.slice(1).filter(r=>r[0]);                  // one row per institute
+  if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
+
+  const partyCols = header.slice(1).map(matchParty);           // party metadata, in column order
+  const labels = partyCols.map(p=>p.meta.name);
+  const barColors = partyCols.map(p=>p.meta.color);
+  const series = body.map(r=>r.slice(1).map(parseNum));
+  const peak = Math.max(0, ...series.flat().filter(v=>v!=null));
+  const axisMax = Math.max(cfg.step, Math.ceil(peak*1.1/cfg.step)*cfg.step);
+
+  el.innerHTML = `<div class="embed-row">${body.map((r,i)=>`
+    <div class="card">
+      <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">${esc(r[0])}</div>
+      <canvas id="${cfg.idPrefix}${i}" height="240"></canvas>
+    </div>`).join('')}</div>`;
+
+  (exitCharts[cfg.idPrefix]||[]).forEach(c=>c.destroy());
+  exitCharts[cfg.idPrefix] = body.map((r,i)=>new Chart(document.getElementById(cfg.idPrefix+i), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:r[0], data:series[i], backgroundColor:barColors, borderRadius:3 }] },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>ctx.parsed.y + cfg.tipSuffix}},
+      },
+      scales:{
+        y:{min:0, max:axisMax, ticks:{callback:v=>v+cfg.axisSuffix}, grid:{color:'#eeece4'}},
+        x:{grid:{display:false}, ticks:{font:{size:9.5}, autoSkip:false, maxRotation:60}},
+      },
+    },
+  }));
+}
+
 async function renderExitVotes(){
   const el = document.getElementById('exitVotesWrap');
   try{
     const rows = await getExitVotesRows();
     if(!rows) throw new Error('no data');
-    const header = rows[0];                                   // ["", "CDU", "AfD", "Linke", ...]
-    const body = rows.slice(1).filter(r=>r[0]);                // one row per institute
-    if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
-
-    const partyCols = header.slice(1).map(matchParty);         // party metadata, in column order
-    const labels = partyCols.map(p=>p.meta.name);
-    const barColors = partyCols.map(p=>p.meta.color);
-
-    el.innerHTML = `<canvas id="exitVotesChart" height="220"></canvas>`;
-    new Chart(document.getElementById('exitVotesChart'), {
-      type:'bar',
-      data:{ labels, datasets: body.map(r=>({
-        label: r[0],
-        data: r.slice(1).map(parseNum),
-        backgroundColor: barColors,
-        borderRadius:3,
-      })) },
-      options:{responsive:true, plugins:{legend:{display:body.length>1,position:'bottom'}},
-        scales:{ y:{ticks:{callback:v=>v+'%'},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
-    });
+    renderExitCharts(el, rows, {idPrefix:'exitVotesChart', step:10, axisSuffix:'%', tipSuffix:'%'});
   }catch(e){
     el.innerHTML = placeholderHTML(GIDS.exitVotes, 'Exit poll (popular vote) figures will appear here once published at 18:00 CEST on 6 September 2026.');
   }
 }
 
-/* Exit poll seats: col0 = party, cols1..n = source columns (seats) */
 async function renderExitSeats(){
   const el = document.getElementById('exitSeatsWrap');
   try{
     const rows = await fetchSheet(GIDS.exitSeats);
-    const header = rows[0];
-    const body = rows.slice(1).filter(r=>r[0]);
-    if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
-
-    const partyCols = header.slice(1).map(matchParty);
-    const labels = partyCols.map(p=>p.meta.name);
-    const barColors = partyCols.map(p=>p.meta.color);
-
-    el.innerHTML = `<canvas id="exitSeatsChart" height="220"></canvas>`;
-    new Chart(document.getElementById('exitSeatsChart'), {
-      type:'bar',
-      data:{ labels, datasets: body.map(r=>({
-        label: r[0],
-        data: r.slice(1).map(parseNum),
-        backgroundColor: barColors,
-        borderRadius:3,
-      })) },
-      options:{responsive:true, plugins:{legend:{display:body.length>1,position:'bottom'}},
-        scales:{ y:{ticks:{stepSize:5},grid:{color:'#eeece4'}}, x:{grid:{display:false}} } }
-    });
+    renderExitCharts(el, rows, {idPrefix:'exitSeatsChart', step:10, axisSuffix:'', tipSuffix:' seats'});
   }catch(e){
     el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
   }
