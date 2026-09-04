@@ -772,7 +772,7 @@ function matchParty(label){
   const table = {
     afd:'AfD', cdu:'CDU', spd:'SPD', linke:'LINKE', 'die linke':'LINKE',
     grune:'GRUENE', gruene:'GRUENE', 'bundnis 90/die grunen':'GRUENE',
-    fdp:'FDP', bsw:'BSW', 'freie wahler':'FW', diebasis:'BASIS', 'die basis':'BASIS',
+    fdp:'FDP', bsw:'BSW', fw:'FW', 'freie wahler':'FW', diebasis:'BASIS', 'die basis':'BASIS',
     tierschutzpartei:'TSP', gartenpartei:'GARTEN', 'die partei':'PARTEI',
     tierschutzallianz:'TSA', pdf:'PDF', volt:'VOLT',
   };
@@ -788,20 +788,28 @@ function getExitVotesRows(){
   if(!exitVotesPromise) exitVotesPromise = fetchSheet(GIDS.exitVotes).catch(()=>null);
   return exitVotesPromise;
 }
-function findColumnIndex(header, needle){
-  for(let i=1;i<header.length;i++){ if(header[i].toLowerCase().includes(needle)) return i; }
-  return header.length>1 ? 1 : -1;
+function parseNum(v){
+  const n = parseFloat(String(v==null?'':v).replace('%','').replace(',','.'));
+  return isNaN(n) ? null : n;
+}
+function findInstituteRow(body, institute){
+  const needle = institute.toLowerCase();
+  return body.find(r => (r[0]||'').toLowerCase().includes(needle)) || null;
+}
+function findPartyColumn(header, partyKey){
+  for(let i=1;i<header.length;i++){
+    if(header[i] && matchParty(header[i]).key===partyKey) return i;
+  }
+  return -1;
 }
 async function getExitVoteFor(partyKey, institute){
   const rows = await getExitVotesRows();
   if(!rows) return null;
   const header = rows[0], body = rows.slice(1).filter(r=>r[0]);
-  const colIdx = findColumnIndex(header, institute);
-  if(colIdx<0) return null;
-  const row = body.find(r=>matchParty(r[0]).key===partyKey);
-  if(!row) return null;
-  const val = parseFloat((row[colIdx]||'').replace('%',''));
-  return isNaN(val) ? null : val;
+  const row = findInstituteRow(body, institute);
+  const colIdx = findPartyColumn(header, partyKey);
+  if(!row || colIdx<0) return null;
+  return parseNum(row[colIdx]);
 }
 
 /* Exit poll votes: col0 = party, cols1..n = source columns (%) */
@@ -822,7 +830,7 @@ async function renderExitVotes(){
       type:'bar',
       data:{ labels, datasets: body.map(r=>({
         label: r[0],
-        data: r.slice(1).map(v=>parseFloat((v||'').replace('%',''))||0),
+        data: r.slice(1).map(parseNum),
         backgroundColor: barColors,
         borderRadius:3,
       })) },
@@ -851,7 +859,7 @@ async function renderExitSeats(){
       type:'bar',
       data:{ labels, datasets: body.map(r=>({
         label: r[0],
-        data: r.slice(1).map(v=>parseFloat(v)||0),
+        data: r.slice(1).map(parseNum),
         backgroundColor: barColors,
         borderRadius:3,
       })) },
@@ -862,7 +870,10 @@ async function renderExitSeats(){
     el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
   }
 }
-  
+
+renderExitVotes();
+renderExitSeats();
+
 /* ---------- RESULTS: all 15 contesting parties ---------- */
 const contestants = [
   {k:'CDU', last:'37.1%'}, {k:'AfD', last:'20.8%'}, {k:'LINKE', last:'11.0%'},
