@@ -216,8 +216,8 @@
     <span class="label">Preferred Prime Minister</span>
   </div>
   <div class="card">
-    <h3>Direktwahl Ministerpräsident · if Saxony-Anhalt's regional prime minister were directly elected…</h3>
-    <div class="sub">Every published poll · direct choice between the two lead candidates</div>
+    <h3>Hypothetical Regional Prime Minister polling (pre-election polls, exit polls)</h3>
+    <div class="sub"></div>
     <div style="height: 400px;">
       <canvas id="pmTrendChart"></canvas>
     </div>
@@ -230,7 +230,7 @@
   </div>
   <div class="card">
     <h3>Possible coalition combinations</h3>
-    <div class="sub">Combined seat/vote share of viable coalition options, per the latest Infratest dimap and Forschungsgruppe Wahlen breakdowns</div>
+    <div class="sub">Combined seat/vote share of viable coalition options, per the latest Infratest dimap and Forschungsgruppe Wahlen exit poll</div>
     <div class="embed-row">
       <div class="card">
         <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap</div>
@@ -271,7 +271,7 @@
     </div>
     <div class="card">
       <h3>Vote share by group, election over election</h3>
-      <div class="sub">Second vote (Zweitstimme) · Infratest dimap im Auftrag der ARD, Wahltagsbefragungen 1998–2021</div>
+      <div class="sub">Second vote (Zweitstimme) · Infratest dimap for ARD, exit polls 1998–2021</div>
       <div class="demo-controls">
         <label for="demoCategorySelect2">Group
           <select id="demoCategorySelect2"></select>
@@ -662,6 +662,7 @@ const pmPolls = [
  {date:'26.08.2026',inst:'Infratest dimap',Schulze:41,Siegmund:39,None:20},
  {date:'28.08.2026',inst:'Forschungsgruppe Wahlen',Schulze:48,Siegmund:32,None:20},
  {date:'02.09.2026',inst:'INSA',Schulze:28,Siegmund:39,None:33},
+ {date:'02.09.2026',inst:'Forschungsgruppe Wahlen',Schulze:48,Siegmund:34,None:18},
 ];
 
 function parsePmDate(str){
