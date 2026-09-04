@@ -216,7 +216,7 @@
     <span class="label">Preferred Prime Minister</span>
   </div>
   <div class="card">
-    <h3>Hypothetical Regional Prime Minister polling (pre-election polls, exit polls)</h3>
+    <h3>Hypothetical Regional Prime Minister Polling (Pre-Election Polls, Exit Polls)</h3>
     <div class="sub"></div>
     <div style="height: 400px;">
       <canvas id="pmTrendChart"></canvas>
@@ -405,8 +405,7 @@
     <p class="threshold-note">The Saxony-Anhalt 2026 row shows the gain implied by the Infratest dimap exit poll (vs. 20.8% in 2021) once published; until then it reflects the current polling swing — already the largest gain on this list.</p>
   </div>
 
-  <footer>
-    This page was built ahead of election day (6 September 2026). Polling, historical-result and preferred-regional-prime-minister figures are sourced and dated as shown; nothing on this page is a live or certified count unless pulled from the linked Google Sheets, which the page owner updates on election night. Last compiled 30 August 2026.
+  <footer>Preferred citation: 
   </footer>
 
 </div>
@@ -679,7 +678,7 @@ const pmMaxX = parsePmDate(pmPolls[pmPolls.length - 1].date);
 const PM_CANDIDATES = {
   Schulze: {label:'Sven Schulze (CDU)', color:'#3399FF'},
   Siegmund: {label:'Ulrich Siegmund (AfD)', color:'#70463A'},
-  None: {label:'keiner/weiß nicht', color:'#9aa0a6'},
+  None: {label:'none/don not know', color:'#9aa0a6'},
 };
 
 const pmPointDatasets = Object.keys(PM_CANDIDATES).map(k => ({
@@ -765,7 +764,9 @@ async function fetchSheet(gid){
   return rows;
 }
 function matchParty(label){
-  const s = label.toLowerCase().replace(/[äàá]/g,'a').replace(/[üù]/g,'u').replace(/[öò]/g,'o').replace(/ß/g,'ss').trim();
+  const s = label.toLowerCase()
+  .replace(/\s*\([^)]*\)\s*$/, '')   // strip trailing " (ESN)", " (EPP)", etc.
+  .replace(/[äàá]/g,'a').replace(/[üù]/g,'u').replace(/[öò]/g,'o').replace(/ß/g,'ss').trim();
   const table = {
     afd:'AfD', cdu:'CDU', spd:'SPD', linke:'LINKE', 'die linke':'LINKE',
     grune:'GRUENE', gruene:'GRUENE', 'bundnis 90/die grunen':'GRUENE',
