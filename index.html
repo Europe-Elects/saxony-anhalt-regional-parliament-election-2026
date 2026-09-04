@@ -820,6 +820,7 @@ async function renderExitVotes(){
     if(!rows) throw new Error('no data');
     const header = rows[0];                                   // ["", "CDU", "AfD", "Linke", ...]
     const body = rows.slice(1).filter(r=>r[0]);                // one row per institute
+    if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
 
     const partyCols = header.slice(1).map(matchParty);         // party metadata, in column order
     const labels = partyCols.map(p=>p.meta.name);
@@ -849,6 +850,7 @@ async function renderExitSeats(){
     const rows = await fetchSheet(GIDS.exitSeats);
     const header = rows[0];
     const body = rows.slice(1).filter(r=>r[0]);
+    if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
 
     const partyCols = header.slice(1).map(matchParty);
     const labels = partyCols.map(p=>p.meta.name);
