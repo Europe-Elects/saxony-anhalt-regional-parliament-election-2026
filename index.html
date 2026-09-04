@@ -759,7 +759,9 @@ function parseCSV(text){
 async function fetchSheet(gid){
   const res = await fetch(sheetCsvUrl(gid));
   if(!res.ok) throw new Error('HTTP '+res.status);
-  const rows = parseCSV(await res.text());
+  const buffer = await res.arrayBuffer();
+  const text = new TextDecoder('utf-8').decode(buffer);
+  const rows = parseCSV(text);
   if(rows.length<2) throw new Error('no data rows');
   return rows;
 }
