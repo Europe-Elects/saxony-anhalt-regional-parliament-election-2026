@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Regional Parliament Election in Saxony-Anhalt · 2026</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha512-SIMGYRUjwY8+gKg7nn9EItdD8LCADSDfJNutF9TPrvEo86sQmFMh6MyralfIyhADlajSxqc7G0gs7+MwWF/ogQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -782,12 +782,28 @@ function placeholderHTML(gid, msg){
   return `<div class="placeholder">${msg}</div>`;
 }
 
-/* Shared, cached fetch of the exit-poll votes sheet so multiple sections can reuse one request */
-let exitVotesPromise = null;
-function getExitVotesRows(){
-  if(!exitVotesPromise) exitVotesPromise = fetchSheet(GIDS.exitVotes).catch(()=>null);
-  return exitVotesPromise;
+const DATA_POLL_MS = 25000;
+
+async function fetchJSON(path){
+  const res = await fetch(`${path}?t=${Date.now()}`, {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
 }
+
+/* Falls back to the Sheet when the generated JSON has no figures, so the page
+   still works if the Action never runs. */
+async function loadExit(kind){
+  const file = kind==='votes' ? 'data/exitVotes.json' : 'data/exitSeats.json';
+  try{
+    const j = await fetchJSON(file);
+    if(j && j.published && Array.isArray(j.rows) && j.rows.length) return [j.header, ...j.rows];
+  }catch(e){ /* fall through to the sheet */ }
+  return fetchSheet(kind==='votes' ? GIDS.exitVotes : GIDS.exitSeats);
+}
+
+let lastExitVotesRows = null;
+function getExitVotesRows(){ return Promise.resolve(lastExitVotesRows); }
+
 function parseNum(v){
   const n = parseFloat(String(v==null?'':v).replace('%','').replace(',','.'));
   return isNaN(n) ? null : n;
@@ -855,29 +871,38 @@ function renderExitCharts(el, rows, cfg){
   }));
 }
 
+/* sig skips redundant redraws; shown stops a failed poll wiping a live chart. */
+const exitState = {votes:{sig:null, shown:false}, seats:{sig:null, shown:false}};
+
 async function renderExitVotes(){
-  const el = document.getElementById('exitVotesWrap');
+  const el = document.getElementById('exitVotesWrap'), st = exitState.votes;
   try{
-    const rows = await getExitVotesRows();
-    if(!rows) throw new Error('no data');
-    renderExitCharts(el, rows, {idPrefix:'exitVotesChart', step:10, axisSuffix:'%', tipSuffix:'%'});
+    const rows = await loadExit('votes');
+    lastExitVotesRows = rows;
+    const sig = JSON.stringify(rows);
+    if(sig !== st.sig){
+      renderExitCharts(el, rows, {idPrefix:'exitVotesChart', step:10, axisSuffix:'%', tipSuffix:'%'});
+      st.sig = sig; st.shown = true;
+      updateSaxonyExitRows();
+    }
   }catch(e){
-    el.innerHTML = placeholderHTML(GIDS.exitVotes, 'Exit poll (popular vote) figures will appear here once published at 18:00 CEST on 6 September 2026.');
+    if(!st.shown) el.innerHTML = placeholderHTML(GIDS.exitVotes, 'Exit poll (popular vote) figures will appear here once published at 18:00 CEST on 6 September 2026.');
   }
 }
 
 async function renderExitSeats(){
-  const el = document.getElementById('exitSeatsWrap');
+  const el = document.getElementById('exitSeatsWrap'), st = exitState.seats;
   try{
-    const rows = await fetchSheet(GIDS.exitSeats);
-    renderExitCharts(el, rows, {idPrefix:'exitSeatsChart', step:10, axisSuffix:'', tipSuffix:' seats'});
+    const rows = await loadExit('seats');
+    const sig = JSON.stringify(rows);
+    if(sig !== st.sig){
+      renderExitCharts(el, rows, {idPrefix:'exitSeatsChart', step:10, axisSuffix:'', tipSuffix:' seats'});
+      st.sig = sig; st.shown = true;
+    }
   }catch(e){
-    el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
+    if(!st.shown) el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
   }
 }
-
-renderExitVotes();
-renderExitSeats();
 
 /* ---------- RESULTS: all 15 contesting parties ---------- */
 const contestants = [
@@ -887,21 +912,49 @@ const contestants = [
   {k:'PARTEI', last:'0.7%'}, {k:'TSA', last:'0.5%'}, {k:'BSW', last:'–'},
   {k:'PDF', last:'—'}, {k:'VOLT', last:'—'},
 ];
-document.getElementById('resultsTable').innerHTML = `
+const PENDING = '<td style="color:var(--muted)">pending</td>';
+
+/* Change columns come from the sheet's formulas — the 2021 baseline lives
+   there, not here. */
+function resultsTableHTML(live){
+  return `
   <thead><tr><th>Party</th><th>Europarty (EU Group)</th><th>2021 result</th><th>2026 result</th><th>+/-</th></tr></thead>
   <tbody>
   ${contestants.map(c=>{
     const m = PARTIES[c.k];
+    const r = live && live[c.k];
+    const cells = r
+      ? `<td>${fmt(r.share)}${r.seats!=null?`<small style="color:var(--muted)"> · ${r.seats} seats</small>`:''}</td>
+         <td style="color:${r.changeV>0?'var(--green)':r.changeV<0?'var(--red)':'inherit'}">${r.changeV!=null?fmtPP(r.changeV):'—'}</td>`
+      : PENDING + PENDING;
     return `<tr>
-      <td style="font-weight:700;color:${m.color==='#FFD700'?'#a68a00':m.color}"><span class="swatch" style="background:${m.color}"></span>&nbsp;${m.name}</td>
-      <td><span class="euro-tag" style="background:${m.color};color:${textColor(m)}">${m.euro}</span></td>
+      <td style="font-weight:700;color:${m.color==='#FFD700'?'#a68a00':m.color}"><span class="swatch" style="background:${m.color}"></span>&nbsp;${esc(m.name)}</td>
+      <td><span class="euro-tag" style="background:${m.color};color:${textColor(m)}">${esc(m.euro)}</span></td>
       <td>${c.last}</td>
-      <td style="color:var(--muted)">pending</td>
-      <td style="color:var(--muted)">pending</td>
+      ${cells}
     </tr>`;
   }).join('')}
   </tbody>
 `;
+}
+
+let resultsSig = null;
+async function renderResultsTable(){
+  let live = null;
+  try{
+    const j = await fetchJSON('data/results.json');
+    if(j && j.counting && Array.isArray(j.parties)){
+      live = {};
+      for(const p of j.parties) if(p.code && p.reported) live[p.code] = p;
+      if(!Object.keys(live).length) live = null;
+    }
+  }catch(e){ /* leave the table as it is */ }
+
+  const sig = JSON.stringify(live);
+  if(sig === resultsSig) return;
+  resultsSig = sig;
+  document.getElementById('resultsTable').innerHTML = resultsTableHTML(live);
+}
 
 /* ---------- AfD BEST / SPD WORST / AfD GAINS ---------- */
 function fmtPP(n){ return (n>=0?'+':'') + (Math.round(n*10)/10).toString().replace('.0','') + 'pp'; }
@@ -961,7 +1014,7 @@ renderRecordList('afdBest', afdBest, afdMax, PARTIES.AfD.color, 41.7, 'afdSaxony
 renderRecordList('spdWorst', spdWorst, spdMax, PARTIES.SPD.color, 8.0, 'spdSaxonyRow');
 renderRecordList('afdGains', afdGains, gainMax, PARTIES.AfD.color, 41.7-AFD_2021, 'afdGainSaxonyRow', fmtPP);
 
-(async function updateSaxonyExitRows(){
+async function updateSaxonyExitRows(){
   const [afdVal, spdVal] = await Promise.all([
     getExitVoteFor('AfD','infratest'),
     getExitVoteFor('SPD','infratest'),
@@ -971,7 +1024,15 @@ renderRecordList('afdGains', afdGains, gainMax, PARTIES.AfD.color, 41.7-AFD_2021
     updatePendingRow('afdGainSaxonyRow', PARTIES.AfD.color, gainMax, afdVal-AFD_2021, fmtPP);
   }
   if(spdVal!=null) updatePendingRow('spdSaxonyRow', PARTIES.SPD.color, spdMax, spdVal);
-})();
+}
+
+function pollLiveData(){
+  renderExitVotes();
+  renderExitSeats();
+  renderResultsTable();
+}
+pollLiveData();
+setInterval(pollLiveData, DATA_POLL_MS);
 </script>
 
 <script type="text/javascript">
