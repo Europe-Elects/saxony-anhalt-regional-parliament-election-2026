@@ -31,6 +31,14 @@ test('quoted commas inside a cell do not split it', () => {
   const rows = parseCSV('"a","b, c","d"');
   assert.deepStrictEqual(rows[0], ['a', 'b, c', 'd']);
 });
+test('a newline inside a quoted cell does not start a new row', () => {
+  const NL = String.fromCharCode(10);
+  const rows = parseCSV('"a","Forschungs-' + NL + 'gruppe","c"' + NL + '"d","e","f"');
+  assert.strictEqual(rows.length, 2);
+  assert.strictEqual(rows[0][1], 'Forschungs-' + NL + 'gruppe');
+  assert.deepStrictEqual(rows[1], ['d', 'e', 'f']);
+});
+
 
 console.log('\nparty label splitting');
 test('splits code and EU group', () => {
