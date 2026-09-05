@@ -1199,8 +1199,14 @@ document.addEventListener('visibilitychange', () => {
 /* Auto-resize support: tells any parent iframe how tall this page's content
    actually is, so the embedding page doesn't need a hardcoded height guess. */
 (function(){
+  var lastSent = 0;
   function reportHeight(){
-    var h = document.documentElement.scrollHeight;
+    /* Measure the content, not documentElement.scrollHeight: that returns the
+       larger of content and viewport, so once the parent has sized the frame
+       the page can never report anything smaller and the frame never shrinks. */
+    var h = Math.ceil(document.body.getBoundingClientRect().height);
+    if (!h || Math.abs(h - lastSent) < 2) return;
+    lastSent = h;
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({ saxonyAnhaltFrameHeight: h }, '*');
     }
