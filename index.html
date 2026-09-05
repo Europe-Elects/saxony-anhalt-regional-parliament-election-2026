@@ -315,6 +315,7 @@
   <div class="card">
     <h3>Saxony-Anhalt 2026 · Exit poll, popular vote</h3>
     <div class="sub">Vote share by party, as published at 18:00 CEST when polls close</div>
+    <div class="updated dataStatus"></div>
     <div id="exitVotesWrap"><div class="placeholder">Loading exit poll data…</div></div>
   </div>
 
@@ -361,6 +362,7 @@
   <div class="card">
     <h3>All contesting parties</h3>
     <div class="sub">All 15 parties approved for the 6 September 2026 ballot, with their European party affiliation. Official second-vote results and the +/- change vs. 2021 will populate after polls close.</div>
+    <div class="updated dataStatus"></div>
     <table id="resultsTable"></table>
   </div>
 
@@ -865,6 +867,11 @@ async function loadExit(kind){
     const j = await fetchJSON(file);
     if(j && j.published && Array.isArray(j.rows) && j.rows.length){
       jsonProven[kind] = true;
+      dataStatus.mode = 'json';
+      /* Oldest wins: if either feed has gone stale, the page has gone stale. */
+      if(j.updated && (!dataStatus.updated || Date.parse(j.updated) < Date.parse(dataStatus.updated))){
+        dataStatus.updated = j.updated;
+      }
       return [j.header, ...j.rows];
     }
   }catch(e){
@@ -874,6 +881,7 @@ async function loadExit(kind){
   if(pollCycle % SHEET_FALLBACK_EVERY !== 1 && lastSheetRows[kind]) return lastSheetRows[kind];
   const rows = await fetchSheet(kind==='votes' ? GIDS.exitVotes : GIDS.exitSeats);
   lastSheetRows[kind] = rows;
+  if(dataStatus.mode !== 'json') dataStatus.mode = 'sheet';
   return rows;
 }
 
@@ -914,7 +922,7 @@ const exitCharts = {};
 function renderExitCharts(el, rows, cfg){
   const header = rows[0];                                     // ["", "CDU", "AfD", "Linke", ...]
   const body = rows.slice(1).filter(r=>r[0]);                  // one row per institute
-  if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw new Error('not published yet');
+  if(!body.some(r=>r.slice(1).some(v=>parseNum(v)!=null))) throw Object.assign(new Error('not published yet'), {noData:true});
 
   const partyCols = header.slice(1).map(matchParty);           // party metadata, in column order
   const labels = partyCols.map(p=>p.meta.name);
@@ -961,8 +969,10 @@ async function renderExitVotes(){
       st.sig = sig; st.shown = true;
       updateSaxonyExitRows();
     }
+    return true;
   }catch(e){
     if(!st.shown) el.innerHTML = placeholderHTML(GIDS.exitVotes, 'Exit poll (popular vote) figures will appear here once published at 18:00 CEST on 6 September 2026.');
+    return e && e.noData === true;
   }
 }
 
@@ -975,8 +985,10 @@ async function renderExitSeats(){
       renderExitCharts(el, rows, {idPrefix:'exitSeatsChart', step:10, axisSuffix:'', tipSuffix:' seats'});
       st.sig = sig; st.shown = true;
     }
+    return true;
   }catch(e){
     if(!st.shown) el.innerHTML = placeholderHTML(GIDS.exitSeats, 'Exit poll seat estimates will appear here once published at 18:00 CEST on 6 September 2026.');
+    return e && e.noData === true;
   }
 }
 
@@ -1016,7 +1028,7 @@ function resultsTableHTML(live){
 
 let resultsSig = null;
 async function renderResultsTable(){
-  let live = null;
+  let live = null, ok = true;
   try{
     const j = await fetchJSON('data/results.json');
     if(j && j.counting && Array.isArray(j.parties)){
@@ -1024,12 +1036,14 @@ async function renderResultsTable(){
       for(const p of j.parties) if(p.code && p.reported) live[p.code] = p;
       if(!Object.keys(live).length) live = null;
     }
-  }catch(e){ /* leave the table as it is */ }
+  }catch(e){ ok = false; }
 
   const sig = JSON.stringify(live);
-  if(sig === resultsSig) return;
-  resultsSig = sig;
-  document.getElementById('resultsTable').innerHTML = resultsTableHTML(live);
+  if(sig !== resultsSig){
+    resultsSig = sig;
+    document.getElementById('resultsTable').innerHTML = resultsTableHTML(live);
+  }
+  return ok;
 }
 
 /* ---------- AfD BEST / SPD WORST / AfD GAINS ---------- */
@@ -1102,6 +1116,43 @@ async function updateSaxonyExitRows(){
   if(spdVal!=null) updatePendingRow('spdSaxonyRow', PARTIES.SPD.color, spdMax, spdVal);
 }
 
+/* Freshness indicator. Without it a dead pipeline looks identical to a quiet
+   one: the page keeps showing the last figures as though they were current. */
+const dataStatus = {mode:'none', updated:null};
+const STALE_MS = 5 * 60 * 1000;
+
+function timeAgo(ms){
+  const s = Math.round(ms/1000);
+  if(s < 90) return s + ' seconds ago';
+  const m = Math.round(s/60);
+  return m < 90 ? m + ' minutes ago' : Math.round(m/60) + ' hours ago';
+}
+
+function renderDataStatus(){
+  const nodes = document.querySelectorAll('.dataStatus');
+  if(!nodes.length) return;
+  let dot = '#22a35a', text;
+
+  if(pollFailures > 0){
+    dot = '#c0392b';
+    text = 'Connection problem — retrying';
+  }else if(dataStatus.mode === 'sheet'){
+    dot = '#e0a800';
+    text = 'Reading the spreadsheet directly — the automatic feed is not running';
+  }else if(dataStatus.mode === 'json' && dataStatus.updated){
+    const age = Date.now() - Date.parse(dataStatus.updated);
+    if(age > STALE_MS){ dot = '#e0a800'; text = 'Last updated ' + timeAgo(age) + ' — the feed may be delayed'; }
+    else text = 'Updated ' + timeAgo(age);
+  }else{
+    dot = '#9aa0a6';
+    text = 'Waiting for the first figures';
+  }
+
+  nodes.forEach(n => {
+    n.innerHTML = `<span class="pulse" style="background:${dot}"></span>${esc(text)}`;
+  });
+}
+
 function pollDelay(){
   const backoff = Math.min(pollFailures, 4);
   return DATA_POLL_MS * Math.pow(2, backoff) + Math.random() * 5000;
@@ -1112,12 +1163,15 @@ function schedulePoll(){ setTimeout(runPoll, pollDelay()); }
 async function runPoll(){
   if(document.hidden){ schedulePoll(); return; }
   pollCycle++;
+  dataStatus.mode = 'none';
+  dataStatus.updated = null;
   try{
-    await Promise.all([renderExitVotes(), renderExitSeats(), renderResultsTable()]);
-    pollFailures = 0;
+    const outcomes = await Promise.all([renderExitVotes(), renderExitSeats(), renderResultsTable()]);
+    pollFailures = outcomes.every(Boolean) ? 0 : pollFailures + 1;
   }catch(e){
     pollFailures++;
   }
+  renderDataStatus();
   schedulePoll();
 }
 
