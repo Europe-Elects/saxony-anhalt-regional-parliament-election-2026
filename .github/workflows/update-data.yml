@@ -14,7 +14,7 @@ on:
 
 permissions:
   contents: write
-  pages: read
+  pages: write
 
 # Queued, not cancelled: a cancelled run could drop a result that landed
 # mid-count.
@@ -32,20 +32,34 @@ jobs:
       # client_payload is attacker-controlled if the dispatch PAT leaks, so it
       # is never read and never interpolated into a run block.
 
-      # A Pages build can fail when two land close together. The failed one
-      # simply does not deploy, so the site silently keeps serving the
-      # previous commit. Runs are frequent, so the cheapest recovery is to
-      # notice here and force a redeploy on this run.
-      - name: Recover a failed Pages build
+      # A Pages build can fail, or hang in "building" and never finish - one
+      # sat there for 32 minutes today while the site kept serving the
+      # previous commit, with GitHub reporting Pages as operational. Either
+      # way the deploy silently stops and nothing signals it. Requesting a
+      # build clears both; the stuck one flips to errored and the new one
+      # finished in 35 seconds.
+      - name: Recover a failed or stalled Pages build
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          status=$(gh api "repos/${GITHUB_REPOSITORY}/pages/builds" --jq '.[0].status' 2>/dev/null || echo unknown)
-          echo "last Pages build: ${status}"
-          if [ "${status}" = "errored" ]; then
-            echo "PAGES_RETRY=1" >> "$GITHUB_ENV"
-            echo "::warning::The previous Pages build failed — forcing a redeploy so the site stops serving stale data"
+          set -uo pipefail
+          info=$(gh api "repos/${GITHUB_REPOSITORY}/pages/builds" --jq '.[0] | "\(.status) \(.created_at)"' 2>/dev/null || echo "unknown -")
+          status=${info%% *}
+          created=${info##* }
+          echo "last Pages build: ${status} (${created})"
+
+          stalled=0
+          if [ "${status}" = "building" ] && [ "${created}" != "-" ]; then
+            age=$(( $(date -u +%s) - $(date -u -d "${created}" +%s) ))
+            echo "that build has been running for ${age}s"
+            [ "${age}" -gt 300 ] && stalled=1
           fi
+
+          if [ "${status}" = "errored" ] || [ "${stalled}" = "1" ]; then
+            echo "::warning::Pages build ${status} for ${created} - requesting a rebuild so the site stops serving stale data"
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" || echo "::warning::rebuild request failed"
+          fi
+
 
       - name: Test the transform
         run: node scripts/build-data.test.js
@@ -60,15 +74,10 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if git diff --cached --quiet; then
-            if [ "${PAGES_RETRY:-}" = "1" ]; then
-              git commit --allow-empty -m "Redeploy after a failed Pages build [skip ci]"
-            else
-              echo "no data changes"
-              exit 0
-            fi
-          else
-            git commit -m "Update election data [skip ci]"
+            echo "no data changes"
+            exit 0
           fi
+          git commit -m "Update election data [skip ci]"
           for attempt in 1 2 3; do
             if git push; then exit 0; fi
             echo "push rejected, rebasing (attempt $attempt)"
