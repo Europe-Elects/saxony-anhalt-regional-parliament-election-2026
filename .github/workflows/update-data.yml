@@ -7,8 +7,10 @@ on:
     types: [sheet-updated]
   workflow_dispatch:
   schedule:
-    # Backstop only — GitHub cron slips under load. The dispatch is primary.
-    - cron: '*/5 * * * *'
+    # Offset from the hour and off a round interval: */5 is the most
+    # contended pattern and GitHub was dropping it entirely. Still only a
+    # backstop — the Apps Script dispatch is the primary trigger.
+    - cron: '3,13,23,33,43,53 * * * *'
 
 permissions:
   contents: write

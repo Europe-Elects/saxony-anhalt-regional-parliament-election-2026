@@ -783,22 +783,41 @@ function placeholderHTML(gid, msg){
 }
 
 const DATA_POLL_MS = 25000;
+/* The Sheet sends no-store, so every viewer polling it directly would reach
+   Google unbuffered. Ration those requests; the JSON path sits behind the
+   Pages CDN and is cheap. */
+const SHEET_FALLBACK_EVERY = 4;
+let pollCycle = 0, pollFailures = 0;
 
 async function fetchJSON(path){
-  const res = await fetch(`${path}?t=${Date.now()}`, {cache:'no-store'});
+  const res = await fetch(`${path}?t=${Math.floor(Date.now()/DATA_POLL_MS)}`, {cache:'no-store'});
   if(!res.ok) throw new Error('HTTP '+res.status);
   return res.json();
 }
 
 /* Falls back to the Sheet when the generated JSON has no figures, so the page
    still works if the Action never runs. */
+const lastSheetRows = {votes:null, seats:null};
+/* Once the pipeline has served real figures, the Sheet is no longer consulted:
+   falling back to an older snapshot after a blip would visibly rewind results
+   mid-count. A failed fetch leaves the chart untouched instead. */
+const jsonProven = {votes:false, seats:false};
 async function loadExit(kind){
   const file = kind==='votes' ? 'data/exitVotes.json' : 'data/exitSeats.json';
   try{
     const j = await fetchJSON(file);
-    if(j && j.published && Array.isArray(j.rows) && j.rows.length) return [j.header, ...j.rows];
-  }catch(e){ /* fall through to the sheet */ }
-  return fetchSheet(kind==='votes' ? GIDS.exitVotes : GIDS.exitSeats);
+    if(j && j.published && Array.isArray(j.rows) && j.rows.length){
+      jsonProven[kind] = true;
+      return [j.header, ...j.rows];
+    }
+  }catch(e){
+    if(jsonProven[kind]) throw e;
+  }
+  if(jsonProven[kind]) throw new Error('pipeline is live; not reverting to the sheet');
+  if(pollCycle % SHEET_FALLBACK_EVERY !== 1 && lastSheetRows[kind]) return lastSheetRows[kind];
+  const rows = await fetchSheet(kind==='votes' ? GIDS.exitVotes : GIDS.exitSeats);
+  lastSheetRows[kind] = rows;
+  return rows;
 }
 
 let lastExitVotesRows = null;
@@ -1026,13 +1045,29 @@ async function updateSaxonyExitRows(){
   if(spdVal!=null) updatePendingRow('spdSaxonyRow', PARTIES.SPD.color, spdMax, spdVal);
 }
 
-function pollLiveData(){
-  renderExitVotes();
-  renderExitSeats();
-  renderResultsTable();
+function pollDelay(){
+  const backoff = Math.min(pollFailures, 4);
+  return DATA_POLL_MS * Math.pow(2, backoff) + Math.random() * 5000;
 }
-pollLiveData();
-setInterval(pollLiveData, DATA_POLL_MS);
+
+function schedulePoll(){ setTimeout(runPoll, pollDelay()); }
+
+async function runPoll(){
+  if(document.hidden){ schedulePoll(); return; }
+  pollCycle++;
+  try{
+    await Promise.all([renderExitVotes(), renderExitSeats(), renderResultsTable()]);
+    pollFailures = 0;
+  }catch(e){
+    pollFailures++;
+  }
+  schedulePoll();
+}
+
+runPoll();
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden && pollFailures === 0) runPoll();
+});
 </script>
 
 <script type="text/javascript">
