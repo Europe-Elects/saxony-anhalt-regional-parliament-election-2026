@@ -518,7 +518,7 @@ function renderDemoChart(suffix){
 
   // Only plot parties that actually have at least one point for this subgroup,
   // ordered to roughly match the party's real-world prominence in the dataset.
-  const partyOrder = ['CDU','AfD','LINKE','SPD','GRUENE','FDP','SCHILL','NPD'];
+  const partyOrder = ['CDU','AfD','LINKE','SPD','GRUENE','FDP','SCHILL','NPD', 'DVU', 'BSW'];
   const partyKeys = partyOrder.filter(k => seriesByParty[k]);
 
   const datasets = partyKeys.map(k=>{
