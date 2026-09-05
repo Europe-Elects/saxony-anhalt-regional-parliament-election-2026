@@ -4,7 +4,7 @@
    runnable from a bare Action runner. */
 
 const assert = require('assert');
-const { parseCSV, parseNum, splitParty, buildExit, buildResults } = require('./build-data');
+const { parseCSV, parseNum, splitParty, buildExit, buildResults, buildDemographic } = require('./build-data');
 
 let passed = 0, failed = 0;
 function test(name, fn) {
@@ -150,6 +150,56 @@ test('partially entered rows do not poison the reported ones', () => {
   assert.strictEqual(out.parties[0].reported, true);
   assert.strictEqual(out.parties[1].reported, false);
   assert.strictEqual(out.parties[1].share, null);
+});
+
+
+const DEMO_HEADER = '"Category","Subgroup","Party","2016","2021","2026"';
+const demoRows = (...rows) => parseCSV([DEMO_HEADER, ...rows].join('\n'));
+
+console.log('\ndemographic breakdown');
+test('nests long-format rows by category, subgroup and party', () => {
+  const out = buildDemographic(demoRows('"Gender","Men","CDU","27","33",""'));
+  assert.deepStrictEqual(out.data.Gender.Men.CDU, { '2016': 27, '2021': 33 });
+  assert.deepStrictEqual(out.years, ['2016', '2021', '2026']);
+});
+test('a year with no figure is absent, not zero', () => {
+  const out = buildDemographic(demoRows('"Gender","Men","CDU","","33",""'));
+  assert.strictEqual(out.data.Gender.Men.CDU['2016'], undefined);
+  assert.strictEqual(out.data.Gender.Men.CDU['2021'], 33);
+});
+test('subgroup order follows the sheet, so reordering rows reorders the menu', () => {
+  const out = buildDemographic(demoRows(
+    '"Age","45–60","CDU","28","35",""',
+    '"Age","18–25","CDU","15","18",""',
+  ));
+  assert.deepStrictEqual(out.order.Age, ['45–60', '18–25']);
+});
+test('a subgroup with every cell blank never reaches the dropdowns', () => {
+  const out = buildDemographic(demoRows(
+    '"Education","Low formal","CDU","29","41",""',
+    '"Education","University degree","CDU","","",""',
+  ));
+  assert.deepStrictEqual(out.order.Education, ['Low formal']);
+  assert.strictEqual(out.data.Education['University degree'], undefined);
+});
+test('maps the historic parties the tab still carries', () => {
+  const out = buildDemographic(demoRows(
+    '"Gender","Men","GRÜNE","5","6",""',
+    '"Gender","Men","Schill","4","",""',
+    '"Gender","Men","NPD","3","",""',
+    '"Gender","Men","DVU","2","",""',
+  ));
+  assert.ok(out.data.Gender.Men.GRUENE && out.data.Gender.Men.SCHILL);
+  assert.ok(out.data.Gender.Men.NPD && out.data.Gender.Men.DVU);
+});
+test('rejects a party it cannot map rather than silently dropping it', () => {
+  throws(() => buildDemographic(demoRows('"Gender","Men","Irgendwas","5","6",""')), /unknown party/);
+});
+test('rejects an impossible share', () => {
+  throws(() => buildDemographic(demoRows('"Gender","Men","CDU","270","33",""')), /out of range/);
+});
+test('rejects a tab with no figures anywhere', () => {
+  throws(() => buildDemographic(demoRows('"Gender","Men","CDU","","",""')), /no figures in any group/);
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);
