@@ -67,21 +67,26 @@ jobs:
       - name: Build data
         run: node scripts/build-data.js
 
+      # /data is generated, never authored, so a rejected push is not a merge
+      # problem - rebasing two independently built copies of the same JSON just
+      # conflicts on the timestamp. Discard, take the new tip, rebuild.
       - name: Commit and push if anything changed
         run: |
           set -euo pipefail
-          git add data
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          if git diff --cached --quiet; then
-            echo "no data changes"
-            exit 0
-          fi
-          git commit -m "Update election data [skip ci]"
           for attempt in 1 2 3; do
+            git add data
+            if git diff --cached --quiet; then
+              echo "no data changes"
+              exit 0
+            fi
+            git commit -m "Update election data [skip ci]"
             if git push; then exit 0; fi
-            echo "push rejected, rebasing (attempt $attempt)"
-            git pull --rebase --autostash
+            echo "push rejected on attempt ${attempt}; rebuilding on the new tip"
+            git fetch origin main
+            git reset --hard origin/main
+            node scripts/build-data.js
           done
           echo "could not push after 3 attempts" >&2
           exit 1
