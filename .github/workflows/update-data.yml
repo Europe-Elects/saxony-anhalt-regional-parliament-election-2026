@@ -1,0 +1,84 @@
+name: Update election data
+
+# repository_dispatch only fires for workflows on the default branch — this
+# file has to be merged to main before the Apps Script trigger does anything.
+on:
+  repository_dispatch:
+    types: [sheet-updated]
+  workflow_dispatch:
+  schedule:
+    # Backstop only — GitHub cron slips under load. The dispatch is primary.
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+# Queued, not cancelled: a cancelled run could drop a result that landed
+# mid-count.
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned to a commit — a tag can be moved.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # client_payload is attacker-controlled if the dispatch PAT leaks, so it
+      # is never read and never interpolated into a run block.
+
+      - name: Test the transform
+        run: node scripts/build-data.test.js
+
+      - name: Build data
+        run: node scripts/build-data.js
+
+      - name: Commit and push if anything changed
+        run: |
+          set -euo pipefail
+          git add data
+          if git diff --cached --quiet; then
+            echo "no data changes"
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m "Update election data [skip ci]"
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "push rejected, rebasing (attempt $attempt)"
+            git pull --rebase --autostash
+          done
+          echo "could not push after 3 attempts" >&2
+          exit 1
+
+      # The charts read the Sheet directly; republishing is what makes them
+      # re-fetch it.
+      - name: Republish Datawrapper charts
+        env:
+          DATAWRAPPER_TOKEN: ${{ secrets.DATAWRAPPER_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${DATAWRAPPER_TOKEN}" ]; then
+            echo "::warning::DATAWRAPPER_TOKEN not set — skipping chart republish"
+            exit 0
+          fi
+          # Live-data charts only. pIGRE and mxgOm are static history.
+          failed=0
+          for id in TviGe k247d YC0Gm n6ZSl Kc3lD EsjOj W2k84; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST \
+              -H "Authorization: Bearer ${DATAWRAPPER_TOKEN}" \
+              "https://api.datawrapper.de/v3/charts/${id}/publish")
+            if [ "$code" = "200" ] || [ "$code" = "201" ]; then
+              echo "republished $id"
+            else
+              echo "::warning::$id republish returned HTTP $code"
+              failed=$((failed + 1))
+            fi
+          done
+          if [ "$failed" -eq 7 ]; then
+            echo "::error::every chart republish failed — check the token"
+            exit 1
+          fi
