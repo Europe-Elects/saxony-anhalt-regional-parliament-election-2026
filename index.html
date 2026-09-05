@@ -208,6 +208,15 @@
     <div style="height: 500px;">
       <canvas id="trendChart"></canvas>
     </div>
+
+  <div class="card">
+    <h3>Sachsen-Anhalt · Voting intention since 1998</h3>
+    <div class="sub">Every poll on record, 1998–2026 · second vote</div>
+    <div style="height: 460px;">
+      <canvas id="historyChart"></canvas>
+    </div>
+    <p class="threshold-note">Includes parties that have since left the Landtag: DVU, NPD, Schill and REP polled significantly in the late 1990s and 2000s. A gap means the party was not prompted for in that poll, not that it scored zero. Certified election results are in the Electoral History section below.</p>
+  </div>
     <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1ikZkOUhOHG6VmfxZYZCjEEQiAI82SabRxUOhy9VLpyw/edit?gid=1238122460#gid=1238122460" target="_blank" rel="noopener">Full poll-by-poll spreadsheet, incl. pollster &amp; commissioner ↗</a>
   </div>
 
@@ -437,6 +446,7 @@ const PARTIES = {
   SCHILL: {name:'Schill (*)', full:'Partei Rechtsstaatlicher Offensive',    family:'Right-wing',   euro:'—',     color:'#6a4fa0', dark:false},
   NPD:    {name:'NPD',    full:'Nationaldemokratische Partei Deutschlands', family:'Far-right',          euro:'—',     color:'#4a3728', dark:false},
   DVU:    {name:'DVU',    full:'Deutsche Volksunion',                   family:'Far-right',             euro:'—',     color:'#5c4a3c', dark:false},
+  REP:    {name:'REP (*)', full:'Die Republikaner',                   family:'Far-right',             euro:'—',     color:'#a08050', dark:false},
   OTHERS: {name:'Others', full:'Others',                                family:'—',                     euro:'—',    color:'#c7c4b8', dark:true},
 };
 function textColor(p){return p.dark ? '#1c1e22' : '#ffffff';}
@@ -624,6 +634,53 @@ new Chart(document.getElementById('trendChart'), {
             const x = items[0].parsed.x;
             const poll = pollByTimestamp[x];
             const dateStr = new Date(x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+
+const POLL_HISTORY = [{"d":"1998-01-29","i":"Infratest dimap","CDU":33,"SPD":38,"GRUENE":7,"FDP":3,"LINKE":16},{"d":"1998-03-12","i":"Infratest dimap","CDU":25,"SPD":45,"GRUENE":5,"FDP":4,"LINKE":16},{"d":"1998-03-18","i":"Forsa","CDU":24,"SPD":44,"GRUENE":4,"FDP":3,"LINKE":19,"REP":4},{"d":"1998-04-02","i":"Forsa","CDU":24,"SPD":44,"GRUENE":4,"FDP":3,"LINKE":20,"REP":3},{"d":"1998-04-03","i":"Forschungsgruppe Wahlen","CDU":25,"SPD":44,"GRUENE":4,"FDP":4,"LINKE":17},{"d":"1998-04-09","i":"Infratest dimap","CDU":25,"SPD":47,"GRUENE":4,"FDP":3,"LINKE":16},{"d":"1998-04-20","i":"Forsa","CDU":22,"SPD":41,"GRUENE":3,"FDP":4,"LINKE":19,"DVU":6},{"d":"1998-04-20","i":"Polis","CDU":22,"SPD":44,"GRUENE":5,"FDP":4,"LINKE":19},{"d":"1998-04-23","i":"Infratest dimap","CDU":26,"SPD":42,"GRUENE":3,"FDP":5,"LINKE":17,"DVU":6},{"d":"2001-12-18","i":"Infratest dimap","CDU":35,"SPD":31,"GRUENE":2,"FDP":5,"LINKE":20,"DVU":2,"SCHILL":3},{"d":"2002-01-17","i":"Uni Halle","SCHILL":1.8},{"d":"2002-01-24","i":"Forsa","CDU":37,"SPD":25,"GRUENE":2,"FDP":7,"LINKE":25,"SCHILL":2},{"d":"2002-02-25","i":"IfM Leipzig","CDU":39,"SPD":31,"GRUENE":2,"FDP":6,"LINKE":19,"SCHILL":2},{"d":"2002-02-28","i":"Infratest dimap","CDU":35,"SPD":30,"GRUENE":2,"FDP":7,"LINKE":20,"SCHILL":4},{"d":"2002-03-15","i":"Forschungsgruppe Wahlen","CDU":36,"SPD":28,"GRUENE":3,"FDP":7,"LINKE":19,"SCHILL":4},{"d":"2002-03-28","i":"Emnid","CDU":33,"SPD":24,"GRUENE":2,"FDP":8,"LINKE":26,"SCHILL":5},{"d":"2002-04-11","i":"Infratest dimap","CDU":32,"SPD":25,"GRUENE":2,"FDP":9,"LINKE":23,"SCHILL":5},{"d":"2002-04-19","i":"Forsa","CDU":34,"SPD":24,"GRUENE":2,"FDP":10,"LINKE":22,"SCHILL":6},{"d":"2004-03-05","i":"IfM Leipzig","CDU":48,"SPD":21,"GRUENE":6,"FDP":4,"LINKE":19},{"d":"2005-01-24","i":"Infratest dimap","CDU":37,"SPD":28,"GRUENE":4,"FDP":6,"LINKE":20},{"d":"2005-04-18","i":"dimap","CDU":47,"SPD":23,"GRUENE":3,"FDP":5,"LINKE":18},{"d":"2005-05-02","i":"IWD","CDU":37,"SPD":26,"GRUENE":4,"FDP":5,"LINKE":21},{"d":"2005-09-05","i":"IWD","FDP":6,"LINKE":30},{"d":"2005-11-25","i":"dimap","CDU":33,"SPD":25,"GRUENE":4,"FDP":9,"LINKE":25},{"d":"2005-12-15","i":"Infratest dimap","CDU":31,"SPD":30,"GRUENE":2,"FDP":6,"LINKE":27},{"d":"2006-02-02","i":"Infratest dimap","CDU":33,"SPD":29,"GRUENE":3,"FDP":6,"LINKE":23,"NPD":2,"REP":2},{"d":"2006-03-02","i":"Infratest dimap","CDU":36,"SPD":27,"GRUENE":4,"FDP":6,"LINKE":22},{"d":"2006-03-14","i":"IfM Leipzig","CDU":38,"SPD":25,"GRUENE":3,"FDP":6,"LINKE":23,"DVU":1,"REP":1},{"d":"2006-03-16","i":"Infratest dimap","CDU":36,"SPD":26,"GRUENE":4,"FDP":6,"LINKE":23,"DVU":3.5},{"d":"2006-03-17","i":"Forschungsgruppe Wahlen","CDU":37,"SPD":23,"GRUENE":4,"FDP":6,"LINKE":23,"DVU":4},{"d":"2006-03-21","i":"Emnid","CDU":36,"SPD":25,"GRUENE":4,"FDP":6,"LINKE":22,"DVU":4},{"d":"2007-04-13","i":"Infratest dimap","CDU":35,"SPD":24,"GRUENE":4,"FDP":7,"LINKE":25},{"d":"2009-05-14","i":"Infratest dimap","CDU":33,"SPD":24,"GRUENE":6,"FDP":7,"LINKE":25,"NPD":2},{"d":"2010-03-17","i":"Infratest dimap","CDU":34,"SPD":20,"GRUENE":5,"FDP":8,"LINKE":29},{"d":"2010-08-25","i":"Emnid","CDU":30,"SPD":22,"GRUENE":7,"FDP":5,"LINKE":27},{"d":"2010-09-23","i":"Infratest dimap","CDU":30,"SPD":21,"GRUENE":9,"FDP":5,"LINKE":30},{"d":"2011-01-20","i":"Infratest dimap","CDU":32,"SPD":22,"GRUENE":8,"FDP":4,"LINKE":28,"NPD":3},{"d":"2011-02-17","i":"Infratest dimap","CDU":32,"SPD":23,"GRUENE":7,"FDP":5,"LINKE":26,"NPD":4},{"d":"2011-02-20","i":"Emnid","CDU":31,"SPD":22,"GRUENE":7,"FDP":5,"LINKE":27,"NPD":5},{"d":"2011-03-10","i":"Infratest dimap","NPD":5},{"d":"2011-03-11","i":"Forschungsgruppe Wahlen","CDU":32,"SPD":24,"GRUENE":5,"FDP":5,"LINKE":24,"NPD":5},{"d":"2013-08-20","i":"Infratest dimap","CDU":39,"SPD":21,"GRUENE":7,"FDP":2,"LINKE":22},{"d":"2015-07-01","i":"GMS","CDU":35,"SPD":21,"GRUENE":6,"FDP":4,"LINKE":21,"AfD":6},{"d":"2015-09-14","i":"Infratest dimap","CDU":34,"SPD":21,"GRUENE":7,"LINKE":26,"AfD":5},{"d":"2015-12-05","i":"INSA","CDU":35,"GRUENE":6,"FDP":3,"LINKE":23},{"d":"2016-01-14","i":"Forschungsgruppe Wahlen","CDU":33,"SPD":19,"GRUENE":5,"FDP":3,"LINKE":19,"AfD":15},{"d":"2016-02-17","i":"Infratest dimap","CDU":32,"SPD":18,"GRUENE":5,"FDP":4,"LINKE":20,"AfD":17},{"d":"2016-02-22","i":"INSA","CDU":30,"SPD":16,"GRUENE":5,"FDP":4,"LINKE":21,"AfD":17},{"d":"2016-02-28","i":"INSA","SPD":17,"GRUENE":5,"FDP":5,"LINKE":20,"AfD":17},{"d":"2016-03-04","i":"Forschungsgruppe Wahlen","CDU":32,"SPD":15,"GRUENE":5,"FDP":4,"LINKE":20,"AfD":17},{"d":"2016-03-05","i":"uniQma","CDU":30,"SPD":18,"GRUENE":5,"FDP":4,"LINKE":19,"AfD":17,"FW":4},{"d":"2016-03-07","i":"INSA","CDU":29,"GRUENE":6,"FDP":4,"LINKE":20,"AfD":19},{"d":"2016-03-09","i":"Forsa","CDU":30,"SPD":17,"GRUENE":5,"FDP":5,"LINKE":20,"AfD":18},{"d":"2016-03-10","i":"Forschungsgruppe Wahlen","CDU":32,"SPD":14,"GRUENE":5,"LINKE":21,"AfD":18},{"d":"2016-11-22","i":"Infratest dimap","CDU":33,"SPD":15,"GRUENE":5,"LINKE":18,"AfD":22},{"d":"2017-06-22","i":"Infratest dimap","CDU":40,"SPD":13,"GRUENE":6,"FDP":5,"LINKE":20,"AfD":13},{"d":"2018-05-22","i":"CONOSCOPE","CDU":35,"SPD":16,"GRUENE":5,"FDP":6,"LINKE":20,"AfD":15},{"d":"2018-08-28","i":"Infratest dimap","CDU":28,"SPD":14,"GRUENE":6,"FDP":8,"LINKE":19,"AfD":21},{"d":"2020-03-20","i":"INSA","CDU":25,"SPD":11,"GRUENE":11,"FDP":4,"LINKE":18,"AfD":25},{"d":"2020-06-05","i":"Infratest dimap","CDU":34,"SPD":13,"GRUENE":8,"FDP":4,"LINKE":16,"AfD":19},{"d":"2020-07-29","i":"GMS","CDU":33,"SPD":12,"GRUENE":10,"FDP":4,"LINKE":16,"AfD":19,"FW":1,"NPD":1},{"d":"2020-12-02","i":"INSA","CDU":29,"SPD":10,"GRUENE":10,"FDP":4,"LINKE":17,"AfD":23},{"d":"2021-01-27","i":"INSA","CDU":30,"SPD":10,"GRUENE":9,"FDP":5,"LINKE":16,"AfD":23},{"d":"2021-04-23","i":"Infratest dimap","CDU":27,"SPD":12,"GRUENE":11,"FDP":8,"LINKE":12,"AfD":20},{"d":"2021-04-29","i":"INSA","CDU":26,"SPD":10,"GRUENE":12,"FDP":6,"LINKE":13,"AfD":24},{"d":"2021-05-26","i":"INSA","CDU":25,"SPD":10,"GRUENE":11,"FDP":8,"LINKE":13,"AfD":26},{"d":"2021-05-27","i":"Infratest dimap","CDU":28,"SPD":11,"GRUENE":9,"FDP":8,"LINKE":10,"AfD":24,"FW":3},{"d":"2021-05-28","i":"Forschungsgruppe Wahlen","CDU":29,"SPD":10,"GRUENE":9,"FDP":8,"LINKE":11,"AfD":23,"FW":3},{"d":"2021-06-03","i":"Forschungsgruppe Wahlen","CDU":30,"SPD":10,"GRUENE":9,"AfD":23,"FW":3},{"d":"2021-06-04","i":"INSA","CDU":27,"SPD":10,"GRUENE":8,"FDP":7,"LINKE":12,"AfD":26,"FW":3},{"d":"2022-02-24","i":"Infratest dimap","CDU":33,"SPD":16,"GRUENE":6,"FDP":5,"LINKE":11,"AfD":20},{"d":"2023-03-21","i":"INSA","CDU":35,"SPD":8,"GRUENE":7,"FDP":6,"LINKE":11,"AfD":26},{"d":"2023-06-27","i":"INSA","CDU":31,"SPD":9,"GRUENE":6,"FDP":6,"LINKE":9,"AfD":29},{"d":"2023-10-24","i":"INSA","CDU":32,"SPD":8,"GRUENE":5,"FDP":4,"LINKE":9,"AfD":33},{"d":"2024-04-18","i":"INSA","CDU":32,"SPD":8,"GRUENE":5,"FDP":4,"LINKE":5,"AfD":29,"BSW":10},{"d":"2024-06-13","i":"INSA","CDU":31,"SPD":7,"GRUENE":4,"FDP":4,"LINKE":5,"AfD":30,"BSW":13},{"d":"2024-07-05","i":"INSA","CDU":29,"SPD":8,"GRUENE":4,"FDP":4,"LINKE":4,"AfD":29,"BSW":16},{"d":"2024-11-05","i":"INSA","CDU":32,"SPD":7,"GRUENE":3,"FDP":4,"LINKE":3,"AfD":30,"BSW":16},{"d":"2025-01-16","i":"INSA","CDU":32,"SPD":8,"GRUENE":3,"FDP":4,"LINKE":4,"AfD":31,"BSW":14},{"d":"2025-06-19","i":"INSA","CDU":34,"SPD":7,"GRUENE":3,"FDP":2,"LINKE":11,"AfD":30,"BSW":8},{"d":"2025-09-04","i":"Infratest dimap","CDU":27,"SPD":7,"GRUENE":3,"LINKE":13,"AfD":39,"BSW":6},{"d":"2025-10-15","i":"INSA","CDU":26,"SPD":6,"GRUENE":3,"FDP":3,"LINKE":11,"AfD":40,"BSW":6},{"d":"2026-01-27","i":"INSA","CDU":26,"SPD":8,"GRUENE":3,"FDP":2,"LINKE":11,"AfD":39,"BSW":6},{"d":"2026-03-25","i":"INSA","CDU":25,"SPD":6,"GRUENE":4,"FDP":3,"LINKE":13,"AfD":38,"BSW":5},{"d":"2026-05-07","i":"Infratest dimap","CDU":26,"SPD":7,"GRUENE":4,"LINKE":12,"AfD":41,"BSW":4},{"d":"2026-05-13","i":"INSA","CDU":24,"SPD":6,"GRUENE":4,"FDP":3,"LINKE":13,"AfD":42,"BSW":4},{"d":"2026-07-03","i":"INSA","CDU":23,"SPD":6,"GRUENE":4,"FDP":4,"LINKE":13,"AfD":41,"BSW":5},{"d":"2026-07-23","i":"INSA","CDU":24,"SPD":5,"GRUENE":4,"FDP":4,"LINKE":14,"AfD":41,"BSW":4},{"d":"2026-07-30","i":"Infratest dimap","CDU":24,"SPD":7,"GRUENE":5,"LINKE":13,"AfD":41,"BSW":4},{"d":"2026-08-10","i":"INSA","CDU":22,"SPD":6,"GRUENE":4,"FDP":4,"LINKE":13,"AfD":42,"BSW":5},{"d":"2026-08-12","i":"pollytix","CDU":23,"SPD":7,"GRUENE":5,"FDP":2,"LINKE":13,"AfD":43,"BSW":4},{"d":"2026-08-26","i":"Infratest dimap","CDU":22,"SPD":8,"GRUENE":6,"FDP":3,"LINKE":11,"AfD":42,"BSW":4},{"d":"2026-08-28","i":"Forschungsgruppe Wahlen","CDU":23,"SPD":9,"GRUENE":6,"FDP":3,"LINKE":13,"AfD":40,"BSW":3},{"d":"2026-09-02","i":"INSA","CDU":22,"SPD":7,"GRUENE":5,"FDP":3,"LINKE":12,"AfD":43,"BSW":4}];
+
+/* ---------- LONG POLLING HISTORY (source: _pre-elex-polls tab) ---------- */
+const historyPartyKeys = ['AfD','CDU','LINKE','SPD','GRUENE','FDP','BSW','FW','NPD','DVU','SCHILL','REP'];
+const histX = d => { const [y,m,dd] = d.split('-').map(Number); return new Date(y, m-1, dd).getTime(); };
+
+const histPeak = Math.max(...POLL_HISTORY.flatMap(r => historyPartyKeys.map(k => r[k] ?? 0)));
+
+new Chart(document.getElementById('historyChart'), {
+  type: 'scatter',
+  data: { datasets: historyPartyKeys.map(k => {
+    const pts = POLL_HISTORY.filter(r => r[k] != null);
+    return {
+      label: PARTIES[k].name,
+      data: pts.map(r => ({ x: histX(r.d), y: r[k], inst: r.i })),
+      borderColor: PARTIES[k].color,
+      backgroundColor: PARTIES[k].color,
+      showLine: false,
+      pointRadius: 2.6,
+      pointHoverRadius: 6,
+    };
+  }) },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 11, font: { size: 10.5 } } },
+      tooltip: { callbacks: {
+        title: items => {
+          const p = items[0].raw;
+          const d = new Date(p.x).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+          return p.inst + ' · ' + d;
+        },
+        label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%',
+      } },
+    },
+    scales: {
+      x: { type: 'linear', min: histX('1998-01-01'), max: histX('2026-09-06'),
+           ticks: { maxTicksLimit: 12, font: { size: 9.5 }, callback: v => new Date(v).getFullYear() },
+           grid: { display: false } },
+      y: { min: 0, max: Math.ceil(histPeak / 10) * 10, ticks: { callback: v => v + '%', font: { size: 10 } },
+           grid: { color: '#eeece4' } },
+    },
+  },
+});
             return poll ? `${poll.inst} · ${dateStr}` : dateStr;
           },
           afterTitle: (items) => {
