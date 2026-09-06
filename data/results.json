@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T23:22:55.470Z",
+  "updated": "2026-09-06T23:23:24.185Z",
   "validVotes": 100.2,
   "counting": true,
   "parties": [
@@ -20,10 +20,10 @@
       "name": "AfD",
       "label": "AfD (ESN)",
       "euro": "ESN",
-      "votes": 44.1,
-      "share": 44.01,
+      "votes": 44,
+      "share": 43.91,
       "seats": 0,
-      "changeV": 23.19,
+      "changeV": 23.09,
       "changeS": -23,
       "reported": true
     },
@@ -44,10 +44,10 @@
       "name": "SPD",
       "label": "SPD (S&D)",
       "euro": "S&D",
-      "votes": 9.2,
-      "share": 9.18,
+      "votes": 9.3,
+      "share": 9.28,
       "seats": 0,
-      "changeV": 0.77,
+      "changeV": 0.87,
       "changeS": -9,
       "reported": true
     },
