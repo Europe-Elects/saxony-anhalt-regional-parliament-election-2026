@@ -186,6 +186,76 @@
     </div>
   </details>
 
+  <!-- ============ ELECTION DAY BLOCK ============ -->
+  <div id="electionday" class="callout">
+    <span class="label">Turnout by the Hour</span>
+  </div>
+  <div class="card">
+    <h3>Saxony-Anhalt 2026 · Turnout by the hour</h3>
+    <div class="sub">Cumulative turnout reported through election day, local time</div>
+    <p class="threshold-note" style="margin:-6px 0 14px;">This plot shows how turnout changed by the hour in different elections.</p>
+    <div id="turnoutWrap" class="iframe-embed">
+      <iframe title="Saxony-Anhalt regional parliament election 2026: Turnout" aria-label="Line chart" id="datawrapper-chart-YC0Gm" src="https://datawrapper.dwcdn.net/YC0Gm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="391" data-external="1"></iframe>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">Exit Poll · Popular Vote</span>
+  </div>
+  <div class="card">
+    <h3>Saxony-Anhalt 2026 · Exit poll, popular vote</h3>
+    <div class="sub">Vote share by party, as published at 18:00 CEST when polls close</div>
+    <div class="updated dataStatus"></div>
+    <div id="exitVotesWrap"><div class="placeholder">Loading exit poll data…</div></div>
+  </div>
+
+  <div class="callout">
+    <span class="label">Exit Poll · Seats</span>
+  </div>
+  <div class="card">
+    <h3>Saxony-Anhalt 2026 · Exit poll, seat estimate</h3>
+    <div class="sub">Projected seats by party, as published at 18:00 CEST</div>
+    <div id="exitSeatsWrap"><div class="placeholder">Loading exit poll data…</div></div>
+  </div>
+
+  <div class="callout">
+    <span class="label">Projections</span>
+  </div>
+  <div class="card">
+    <h3>Infratest dimap &amp; Forschungsgruppe Wahlen · voting intention over time</h3>
+    <div class="sub">Every full-breakdown poll from these two institutes published since the 2021 election, popular vote and projected seats</div>
+    <div class="embed-row">
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · popular vote</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-n6ZSl" src="https://datawrapper.dwcdn.net/n6ZSl/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · seats</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (seats)" aria-label="Line chart" id="datawrapper-chart-Kc3lD" src="https://datawrapper.dwcdn.net/Kc3lD/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · popular vote</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-EsjOj" src="https://datawrapper.dwcdn.net/EsjOj/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · seats</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (seats)" aria-label="Line chart" id="datawrapper-chart-W2k84" src="https://datawrapper.dwcdn.net/W2k84/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+    </div>
+    <p class="threshold-note">Both institutes publish their first projection at about 18:20 CEST on 6 September 2026 and revise it through the evening as counting proceeds. These charts stay empty until then.</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="callout">
+    <span class="label">Results</span>
+  </div>
+  <div class="card">
+    <h3>All contesting parties</h3>
+    <div class="sub">All 15 parties approved for the 6 September 2026 ballot, with their European party affiliation. Official second-vote results and the +/- change vs. 2021 will populate after polls close.</div>
+    <div class="updated dataStatus"></div>
+    <table id="resultsTable"></table>
+  </div>
+
   <!-- 2021 RESULT -->
   <details class="accordion">
     <summary class="callout"><span class="label">2021 Result · Outgoing Regional Parliament</span><span class="chevron">▾</span></summary>
@@ -208,6 +278,7 @@
     <div style="height: 500px;">
       <canvas id="trendChart"></canvas>
     </div>
+  </div>
 
   <div class="card">
     <h3>Sachsen-Anhalt · Voting intention since 1998</h3>
@@ -216,6 +287,7 @@
       <canvas id="historyChart"></canvas>
     </div>
     <p class="threshold-note">Includes parties that have since left the Landtag: DVU, NPD, Schill and REP polled significantly in the late 1990s and 2000s. A gap means the party was not prompted for in that poll, not that it scored zero. Certified election results are in the Electoral History section below.</p>
+  </div>
 
   <!-- PREFERRED PRIME MINISTER -->
   <div class="callout">
@@ -292,76 +364,6 @@
       </div>
       <p class="demo-note" id="demoNote2"></p>
     </div>
-  </div>
-
-  <!-- ============ ELECTION DAY BLOCK ============ -->
-  <div id="electionday" class="callout">
-    <span class="label">Turnout by the Hour</span>
-  </div>
-  <div class="card">
-    <h3>Saxony-Anhalt 2026 · Turnout by the hour</h3>
-    <div class="sub">Cumulative turnout reported through election day, local time</div>
-    <p class="threshold-note" style="margin:-6px 0 14px;">This plot shows how turnout changed by the hour in different elections.</p>
-    <div id="turnoutWrap" class="iframe-embed">
-      <iframe title="Saxony-Anhalt regional parliament election 2026: Turnout" aria-label="Line chart" id="datawrapper-chart-YC0Gm" src="https://datawrapper.dwcdn.net/YC0Gm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="391" data-external="1"></iframe>
-    </div>
-  </div>
-
-  <div class="callout">
-    <span class="label">Exit Poll · Popular Vote</span>
-  </div>
-  <div class="card">
-    <h3>Saxony-Anhalt 2026 · Exit poll, popular vote</h3>
-    <div class="sub">Vote share by party, as published at 18:00 CEST when polls close</div>
-    <div class="updated dataStatus"></div>
-    <div id="exitVotesWrap"><div class="placeholder">Loading exit poll data…</div></div>
-  </div>
-
-  <div class="callout">
-    <span class="label">Exit Poll · Seats</span>
-  </div>
-  <div class="card">
-    <h3>Saxony-Anhalt 2026 · Exit poll, seat estimate</h3>
-    <div class="sub">Projected seats by party, as published at 18:00 CEST</div>
-    <div id="exitSeatsWrap"><div class="placeholder">Loading exit poll data…</div></div>
-  </div>
-
-  <div class="callout">
-    <span class="label">Projections</span>
-  </div>
-  <div class="card">
-    <h3>Infratest dimap &amp; Forschungsgruppe Wahlen · voting intention over time</h3>
-    <div class="sub">Every full-breakdown poll from these two institutes published since the 2021 election, popular vote and projected seats</div>
-    <div class="embed-row">
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · popular vote</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-n6ZSl" src="https://datawrapper.dwcdn.net/n6ZSl/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · seats</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (seats)" aria-label="Line chart" id="datawrapper-chart-Kc3lD" src="https://datawrapper.dwcdn.net/Kc3lD/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · popular vote</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-EsjOj" src="https://datawrapper.dwcdn.net/EsjOj/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · seats</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (seats)" aria-label="Line chart" id="datawrapper-chart-W2k84" src="https://datawrapper.dwcdn.net/W2k84/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-    </div>
-    <p class="threshold-note">Both institutes publish their first projection at about 18:20 CEST on 6 September 2026 and revise it through the evening as counting proceeds. These charts stay empty until then.</p>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results" class="callout">
-    <span class="label">Results</span>
-  </div>
-  <div class="card">
-    <h3>All contesting parties</h3>
-    <div class="sub">All 15 parties approved for the 6 September 2026 ballot, with their European party affiliation. Official second-vote results and the +/- change vs. 2021 will populate after polls close.</div>
-    <div class="updated dataStatus"></div>
-    <table id="resultsTable"></table>
   </div>
 
   <!-- ELECTORAL HISTORY -->
