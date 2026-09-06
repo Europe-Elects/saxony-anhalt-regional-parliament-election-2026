@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-06T18:49:17.943Z",
-  "validVotes": 70.7,
+  "updated": "2026-09-06T18:49:43.874Z",
+  "validVotes": 90.6,
   "counting": true,
   "parties": [
     {
@@ -9,9 +9,9 @@
       "label": "CDU (EPP)",
       "euro": "EPP",
       "votes": 16.3,
-      "share": 23.06,
+      "share": 17.99,
       "seats": 0,
-      "changeV": -14.06,
+      "changeV": -19.13,
       "changeS": -40,
       "reported": true
     },
@@ -21,9 +21,9 @@
       "label": "AfD (ESN)",
       "euro": "ESN",
       "votes": 46.2,
-      "share": 65.35,
+      "share": 50.99,
       "seats": 0,
-      "changeV": 44.53,
+      "changeV": 30.17,
       "changeS": -23,
       "reported": true
     },
@@ -33,9 +33,9 @@
       "label": "LINKE (Left)",
       "euro": "Left",
       "votes": 8.2,
-      "share": 11.6,
+      "share": 9.05,
       "seats": 0,
-      "changeV": 0.61,
+      "changeV": -1.94,
       "changeS": -12,
       "reported": true
     },
@@ -45,9 +45,9 @@
       "label": "SPD (S&D)",
       "euro": "S&D",
       "votes": 8.7,
-      "share": 0,
+      "share": 9.6,
       "seats": 0,
-      "changeV": -8.41,
+      "changeV": 1.19,
       "changeS": -9,
       "reported": true
     },
@@ -57,9 +57,9 @@
       "label": "FDP (RE)",
       "euro": "RE",
       "votes": 2.5,
-      "share": 0,
+      "share": 2.76,
       "seats": 0,
-      "changeV": -6.42,
+      "changeV": -3.66,
       "changeS": -7,
       "reported": true
     },
@@ -69,9 +69,9 @@
       "label": "GRÜNE (Greens/EFA)",
       "euro": "Greens/EFA",
       "votes": 8.7,
-      "share": 0,
+      "share": 9.6,
       "seats": 0,
-      "changeV": -5.94,
+      "changeV": 3.66,
       "changeS": -6,
       "reported": true
     },
