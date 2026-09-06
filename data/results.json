@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-06T21:26:46.304Z",
-  "validVotes": 0,
+  "updated": "2026-09-06T21:27:12.985Z",
+  "validVotes": 100,
   "counting": true,
   "parties": [
     {
@@ -8,11 +8,11 @@
       "name": "CDU",
       "label": "CDU (EPP)",
       "euro": "EPP",
-      "votes": 206245,
-      "share": 16.8,
-      "seats": 16.8,
-      "changeV": 0,
-      "changeS": -20.32,
+      "votes": 16.9,
+      "share": 16.9,
+      "seats": 0,
+      "changeV": -20.22,
+      "changeS": -40,
       "reported": true
     },
     {
@@ -20,11 +20,11 @@
       "name": "AfD",
       "label": "AfD (ESN)",
       "euro": "ESN",
-      "votes": 5445275,
-      "share": 44.9,
-      "seats": 44.9,
-      "changeV": 0,
-      "changeS": 24.08,
+      "votes": 44.6,
+      "share": 44.6,
+      "seats": 0,
+      "changeV": 23.78,
+      "changeS": -23,
       "reported": true
     },
     {
@@ -32,156 +32,156 @@
       "name": "LINKE",
       "label": "LINKE (Left)",
       "euro": "Left",
-      "votes": null,
-      "share": null,
-      "seats": null,
-      "changeV": null,
-      "changeS": null,
-      "reported": false
+      "votes": 8.4,
+      "share": 8.4,
+      "seats": 0,
+      "changeV": -2.59,
+      "changeS": -12,
+      "reported": true
     },
     {
       "code": "SPD",
       "name": "SPD",
       "label": "SPD (S&D)",
       "euro": "S&D",
-      "votes": null,
-      "share": null,
-      "seats": null,
-      "changeV": null,
-      "changeS": null,
-      "reported": false
+      "votes": 9.1,
+      "share": 9.1,
+      "seats": 0,
+      "changeV": 0.69,
+      "changeS": -9,
+      "reported": true
     },
     {
       "code": "FDP",
       "name": "FDP",
       "label": "FDP (RE)",
       "euro": "RE",
-      "votes": null,
-      "share": null,
-      "seats": null,
-      "changeV": null,
-      "changeS": null,
-      "reported": false
+      "votes": 2.5,
+      "share": 2.5,
+      "seats": 0,
+      "changeV": -3.92,
+      "changeS": -7,
+      "reported": true
     },
     {
       "code": "GRUENE",
       "name": "GRÜNE",
       "label": "GRÜNE (Greens/EFA)",
       "euro": "Greens/EFA",
-      "votes": null,
-      "share": null,
-      "seats": null,
-      "changeV": null,
-      "changeS": null,
-      "reported": false
+      "votes": 8.9,
+      "share": 8.9,
+      "seats": 0,
+      "changeV": 2.96,
+      "changeS": -6,
+      "reported": true
     },
     {
       "code": "FW",
       "name": "FW",
       "label": "FW (RE)",
       "euro": "RE",
-      "votes": null,
-      "share": null,
+      "votes": 1.2,
+      "share": 1.2,
       "seats": null,
-      "changeV": null,
+      "changeV": -1.93,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "BASIS",
       "name": "Basis",
       "label": "Basis (*)",
       "euro": "*",
-      "votes": null,
-      "share": null,
+      "votes": 0.1,
+      "share": 0.1,
       "seats": null,
-      "changeV": null,
+      "changeV": -1.37,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "TSP",
       "name": "Tierschutzpartei",
       "label": "Tierschutzpartei (Left)",
       "euro": "Left",
-      "votes": null,
-      "share": null,
+      "votes": 1.1,
+      "share": 1.1,
       "seats": null,
-      "changeV": null,
+      "changeV": -0.34,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "GARTEN",
       "name": "Gartenpartei",
       "label": "Gartenpartei (*)",
       "euro": "*",
-      "votes": null,
-      "share": null,
+      "votes": 0.6,
+      "share": 0.6,
       "seats": null,
-      "changeV": null,
+      "changeV": -0.21,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "PARTEI",
       "name": "PARTEI",
       "label": "PARTEI (NI)",
       "euro": "NI",
-      "votes": null,
-      "share": null,
+      "votes": 0.3,
+      "share": 0.3,
       "seats": null,
-      "changeV": null,
+      "changeV": -0.43,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "TSA",
       "name": "Tierschutzallianz",
       "label": "Tierschutzallianz (*)",
       "euro": "*",
-      "votes": null,
-      "share": null,
+      "votes": 0.6,
+      "share": 0.6,
       "seats": null,
-      "changeV": null,
+      "changeV": 0.12,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "BSW",
       "name": "BSW",
       "label": "BSW (NI)",
       "euro": "NI",
-      "votes": null,
-      "share": null,
+      "votes": 5.2,
+      "share": 5.2,
       "seats": null,
-      "changeV": null,
+      "changeV": 5.2,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "PDF",
       "name": "PdF",
       "label": "PdF (RE)",
       "euro": "RE",
-      "votes": null,
-      "share": null,
+      "votes": 0.2,
+      "share": 0.2,
       "seats": null,
-      "changeV": null,
+      "changeV": 0.2,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "VOLT",
       "name": "Volt",
       "label": "Volt (Greens/EFA)",
       "euro": "Greens/EFA",
-      "votes": null,
-      "share": null,
+      "votes": 0.3,
+      "share": 0.3,
       "seats": null,
-      "changeV": null,
+      "changeV": 0.3,
       "changeS": null,
-      "reported": false
+      "reported": true
     }
   ]
 }
