@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-06T18:51:02.697Z",
-  "validVotes": 99.7,
+  "updated": "2026-09-06T18:51:28.306Z",
+  "validVotes": 100,
   "counting": true,
   "parties": [
     {
@@ -9,9 +9,9 @@
       "label": "CDU (EPP)",
       "euro": "EPP",
       "votes": 16.3,
-      "share": 16.35,
+      "share": 16.3,
       "seats": 0,
-      "changeV": -20.77,
+      "changeV": -20.82,
       "changeS": -40,
       "reported": true
     },
@@ -21,9 +21,9 @@
       "label": "AfD (ESN)",
       "euro": "ESN",
       "votes": 46.2,
-      "share": 46.34,
+      "share": 46.2,
       "seats": 0,
-      "changeV": 25.52,
+      "changeV": 25.38,
       "changeS": -23,
       "reported": true
     },
@@ -33,9 +33,9 @@
       "label": "LINKE (Left)",
       "euro": "Left",
       "votes": 8.2,
-      "share": 8.22,
+      "share": 8.2,
       "seats": 0,
-      "changeV": -2.77,
+      "changeV": -2.79,
       "changeS": -12,
       "reported": true
     },
@@ -45,9 +45,9 @@
       "label": "SPD (S&D)",
       "euro": "S&D",
       "votes": 8.7,
-      "share": 8.73,
+      "share": 8.7,
       "seats": 0,
-      "changeV": 0.32,
+      "changeV": 0.29,
       "changeS": -9,
       "reported": true
     },
@@ -57,9 +57,9 @@
       "label": "FDP (RE)",
       "euro": "RE",
       "votes": 2.5,
-      "share": 2.51,
+      "share": 2.5,
       "seats": 0,
-      "changeV": -3.91,
+      "changeV": -3.92,
       "changeS": -7,
       "reported": true
     },
@@ -69,9 +69,9 @@
       "label": "GRÜNE (Greens/EFA)",
       "euro": "Greens/EFA",
       "votes": 8.7,
-      "share": 8.73,
+      "share": 8.7,
       "seats": 0,
-      "changeV": 2.79,
+      "changeV": 2.76,
       "changeS": -6,
       "reported": true
     },
@@ -153,9 +153,9 @@
       "label": "BSW (NI)",
       "euro": "NI",
       "votes": 5.1,
-      "share": 5.12,
+      "share": 5.1,
       "seats": null,
-      "changeV": 5.12,
+      "changeV": 5.1,
       "changeS": null,
       "reported": true
     },
@@ -176,12 +176,12 @@
       "name": "Volt",
       "label": "Volt (Greens/EFA)",
       "euro": "Greens/EFA",
-      "votes": null,
-      "share": null,
+      "votes": 0.3,
+      "share": 0.3,
       "seats": null,
-      "changeV": null,
+      "changeV": 0.3,
       "changeS": null,
-      "reported": false
+      "reported": true
     }
   ]
 }
