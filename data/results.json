@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-06T18:49:43.874Z",
-  "validVotes": 90.6,
+  "updated": "2026-09-06T18:50:07.448Z",
+  "validVotes": 91.8,
   "counting": true,
   "parties": [
     {
@@ -9,9 +9,9 @@
       "label": "CDU (EPP)",
       "euro": "EPP",
       "votes": 16.3,
-      "share": 17.99,
+      "share": 17.76,
       "seats": 0,
-      "changeV": -19.13,
+      "changeV": -19.36,
       "changeS": -40,
       "reported": true
     },
@@ -21,9 +21,9 @@
       "label": "AfD (ESN)",
       "euro": "ESN",
       "votes": 46.2,
-      "share": 50.99,
+      "share": 50.33,
       "seats": 0,
-      "changeV": 30.17,
+      "changeV": 29.51,
       "changeS": -23,
       "reported": true
     },
@@ -33,9 +33,9 @@
       "label": "LINKE (Left)",
       "euro": "Left",
       "votes": 8.2,
-      "share": 9.05,
+      "share": 8.93,
       "seats": 0,
-      "changeV": -1.94,
+      "changeV": -2.06,
       "changeS": -12,
       "reported": true
     },
@@ -45,9 +45,9 @@
       "label": "SPD (S&D)",
       "euro": "S&D",
       "votes": 8.7,
-      "share": 9.6,
+      "share": 9.48,
       "seats": 0,
-      "changeV": 1.19,
+      "changeV": 1.07,
       "changeS": -9,
       "reported": true
     },
@@ -57,9 +57,9 @@
       "label": "FDP (RE)",
       "euro": "RE",
       "votes": 2.5,
-      "share": 2.76,
+      "share": 2.72,
       "seats": 0,
-      "changeV": -3.66,
+      "changeV": -3.7,
       "changeS": -7,
       "reported": true
     },
@@ -69,9 +69,9 @@
       "label": "GRÜNE (Greens/EFA)",
       "euro": "Greens/EFA",
       "votes": 8.7,
-      "share": 9.6,
+      "share": 9.48,
       "seats": 0,
-      "changeV": 3.66,
+      "changeV": 3.54,
       "changeS": -6,
       "reported": true
     },
@@ -81,9 +81,9 @@
       "label": "FW (RE)",
       "euro": "RE",
       "votes": 1.1,
-      "share": 0,
+      "share": 1.2,
       "seats": null,
-      "changeV": -3.13,
+      "changeV": -1.93,
       "changeS": null,
       "reported": true
     },
@@ -93,9 +93,9 @@
       "label": "Basis (*)",
       "euro": "*",
       "votes": 0.1,
-      "share": 0,
+      "share": 0.11,
       "seats": null,
-      "changeV": -1.47,
+      "changeV": -1.36,
       "changeS": null,
       "reported": true
     },
@@ -104,84 +104,84 @@
       "name": "Tierschutzpartei",
       "label": "Tierschutzpartei (Left)",
       "euro": "Left",
-      "votes": 1.1,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": -1.44,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "GARTEN",
       "name": "Gartenpartei",
       "label": "Gartenpartei (*)",
       "euro": "*",
-      "votes": 0.6,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": -0.81,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "PARTEI",
       "name": "PARTEI",
       "label": "PARTEI (NI)",
       "euro": "NI",
-      "votes": 0.3,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": -0.73,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "TSA",
       "name": "Tierschutzallianz",
       "label": "Tierschutzallianz (*)",
       "euro": "*",
-      "votes": 0.6,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": -0.48,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "BSW",
       "name": "BSW",
       "label": "BSW (NI)",
       "euro": "NI",
-      "votes": 5.1,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": 0,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "PDF",
       "name": "PdF",
       "label": "PdF (RE)",
       "euro": "RE",
-      "votes": 0.2,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": 0,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "VOLT",
       "name": "Volt",
       "label": "Volt (Greens/EFA)",
       "euro": "Greens/EFA",
-      "votes": 0.3,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": 0,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     }
   ]
 }
