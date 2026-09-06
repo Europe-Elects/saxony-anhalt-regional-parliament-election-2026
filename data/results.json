@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:47:08.158Z",
+  "updated": "2026-09-06T18:47:31.016Z",
   "validVotes": 0,
   "counting": true,
   "parties": [
@@ -80,12 +80,12 @@
       "name": "FW",
       "label": "FW (RE)",
       "euro": "RE",
-      "votes": 1.1,
-      "share": 0,
+      "votes": null,
+      "share": null,
       "seats": null,
-      "changeV": -3.13,
+      "changeV": null,
       "changeS": null,
-      "reported": true
+      "reported": false
     },
     {
       "code": "BASIS",
