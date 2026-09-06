@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-05T19:21:52.822Z",
-  "published": false,
+  "updated": "2026-09-06T15:18:22.984Z",
+  "published": true,
   "header": [
     "",
     "CDU",
@@ -22,7 +22,7 @@
       "",
       "",
       "",
-      ""
+      "100"
     ],
     [
       "Infratest dimap for ARD",
@@ -33,7 +33,7 @@
       "",
       "",
       "",
-      ""
+      "100"
     ]
   ]
 }
