@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T22:41:13.960Z",
+  "updated": "2026-09-06T22:43:58.449Z",
   "validVotes": 100.1,
   "counting": true,
   "parties": [
@@ -20,10 +20,10 @@
       "name": "AfD",
       "label": "AfD (ESN)",
       "euro": "ESN",
-      "votes": 44.2,
-      "share": 44.16,
+      "votes": 44.1,
+      "share": 44.06,
       "seats": 0,
-      "changeV": 23.34,
+      "changeV": 23.24,
       "changeS": -23,
       "reported": true
     },
@@ -152,10 +152,10 @@
       "name": "BSW",
       "label": "BSW (NI)",
       "euro": "NI",
-      "votes": 5.2,
-      "share": 5.19,
+      "votes": 5.3,
+      "share": 5.29,
       "seats": null,
-      "changeV": 5.19,
+      "changeV": 5.29,
       "changeS": null,
       "reported": true
     },
