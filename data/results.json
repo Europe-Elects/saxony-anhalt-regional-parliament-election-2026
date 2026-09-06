@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:48:03.914Z",
+  "updated": "2026-09-06T18:48:28.261Z",
   "validVotes": 0,
   "counting": true,
   "parties": [
@@ -152,7 +152,7 @@
       "name": "BSW",
       "label": "BSW (NI)",
       "euro": "NI",
-      "votes": 5,
+      "votes": 5.1,
       "share": 0,
       "seats": null,
       "changeV": 0,
