@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-06T18:48:28.261Z",
-  "validVotes": 0,
+  "updated": "2026-09-06T18:49:17.943Z",
+  "validVotes": 70.7,
   "counting": true,
   "parties": [
     {
@@ -9,9 +9,9 @@
       "label": "CDU (EPP)",
       "euro": "EPP",
       "votes": 16.3,
-      "share": 0,
+      "share": 23.06,
       "seats": 0,
-      "changeV": -37.12,
+      "changeV": -14.06,
       "changeS": -40,
       "reported": true
     },
@@ -21,9 +21,9 @@
       "label": "AfD (ESN)",
       "euro": "ESN",
       "votes": 46.2,
-      "share": 0,
+      "share": 65.35,
       "seats": 0,
-      "changeV": -20.82,
+      "changeV": 44.53,
       "changeS": -23,
       "reported": true
     },
@@ -33,9 +33,9 @@
       "label": "LINKE (Left)",
       "euro": "Left",
       "votes": 8.2,
-      "share": 0,
+      "share": 11.6,
       "seats": 0,
-      "changeV": -10.99,
+      "changeV": 0.61,
       "changeS": -12,
       "reported": true
     },
