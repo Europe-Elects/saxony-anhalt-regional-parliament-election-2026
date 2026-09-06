@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T17:45:03.967Z",
+  "updated": "2026-09-06T17:45:28.546Z",
   "validVotes": 0,
   "counting": true,
   "parties": [
@@ -140,48 +140,48 @@
       "name": "Tierschutzallianz",
       "label": "Tierschutzallianz (*)",
       "euro": "*",
-      "votes": null,
-      "share": null,
+      "votes": 0.6,
+      "share": 0,
       "seats": null,
-      "changeV": null,
+      "changeV": -0.48,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "BSW",
       "name": "BSW",
       "label": "BSW (NI)",
       "euro": "NI",
-      "votes": null,
-      "share": null,
+      "votes": 5,
+      "share": 0,
       "seats": null,
-      "changeV": null,
+      "changeV": 0,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "PDF",
       "name": "PdF",
       "label": "PdF (RE)",
       "euro": "RE",
-      "votes": null,
-      "share": null,
+      "votes": 0.2,
+      "share": 0,
       "seats": null,
-      "changeV": null,
+      "changeV": 0,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "VOLT",
       "name": "Volt",
       "label": "Volt (Greens/EFA)",
       "euro": "Greens/EFA",
-      "votes": null,
-      "share": null,
+      "votes": 0.3,
+      "share": 0,
       "seats": null,
-      "changeV": null,
+      "changeV": 0,
       "changeS": null,
-      "reported": false
+      "reported": true
     }
   ]
 }
