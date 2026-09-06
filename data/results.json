@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-06T18:47:31.016Z",
+  "updated": "2026-09-06T18:48:03.914Z",
   "validVotes": 0,
   "counting": true,
   "parties": [
@@ -80,12 +80,12 @@
       "name": "FW",
       "label": "FW (RE)",
       "euro": "RE",
-      "votes": null,
-      "share": null,
+      "votes": 1.1,
+      "share": 0,
       "seats": null,
-      "changeV": null,
+      "changeV": -3.13,
       "changeS": null,
-      "reported": false
+      "reported": true
     },
     {
       "code": "BASIS",
@@ -116,7 +116,7 @@
       "name": "Gartenpartei",
       "label": "Gartenpartei (*)",
       "euro": "*",
-      "votes": 0.5,
+      "votes": 0.6,
       "share": 0,
       "seats": null,
       "changeV": -0.81,
@@ -128,7 +128,7 @@
       "name": "PARTEI",
       "label": "PARTEI (NI)",
       "euro": "NI",
-      "votes": 0.2,
+      "votes": 0.3,
       "share": 0,
       "seats": null,
       "changeV": -0.73,
