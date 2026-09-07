@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-07T04:08:50.214Z",
+  "updated": "2026-09-07T04:09:17.793Z",
   "validVotes": 100.13,
   "counting": true,
   "parties": [
@@ -10,9 +10,9 @@
       "euro": "EPP",
       "votes": 17.23,
       "share": 17.23,
-      "seats": 0,
+      "seats": 15,
       "changeV": -19.89,
-      "changeS": -40,
+      "changeS": -25,
       "reported": true
     },
     {
@@ -22,9 +22,9 @@
       "euro": "ESN",
       "votes": 43.8,
       "share": 43.74,
-      "seats": 0,
+      "seats": 39,
       "changeV": 22.92,
-      "changeS": -23,
+      "changeS": 16,
       "reported": true
     },
     {
@@ -34,9 +34,9 @@
       "euro": "Left",
       "votes": 8.6,
       "share": 8.56,
-      "seats": 0,
+      "seats": 8,
       "changeV": -2.43,
-      "changeS": -12,
+      "changeS": -4,
       "reported": true
     },
     {
@@ -46,9 +46,9 @@
       "euro": "S&D",
       "votes": 9.3,
       "share": 9.3,
-      "seats": 0,
+      "seats": 8,
       "changeV": 0.89,
-      "changeS": -9,
+      "changeS": -1,
       "reported": true
     },
     {
@@ -70,9 +70,9 @@
       "euro": "Greens/EFA",
       "votes": 8.9,
       "share": 8.93,
-      "seats": 0,
+      "seats": 8,
       "changeV": 2.99,
-      "changeS": -6,
+      "changeS": 2,
       "reported": true
     },
     {
@@ -154,7 +154,7 @@
       "euro": "NI",
       "votes": 5.3,
       "share": 5.27,
-      "seats": null,
+      "seats": 5,
       "changeV": 5.27,
       "changeS": null,
       "reported": true
