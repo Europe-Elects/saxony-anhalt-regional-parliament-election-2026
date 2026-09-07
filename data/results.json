@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-07T04:08:16.084Z",
+  "updated": "2026-09-07T04:08:50.214Z",
   "validVotes": 100.13,
   "counting": true,
   "parties": [
@@ -105,9 +105,9 @@
       "label": "Tierschutzpartei (Left)",
       "euro": "Left",
       "votes": 1.1,
-      "share": 1.1,
+      "share": 1.09,
       "seats": null,
-      "changeV": -0.34,
+      "changeV": -0.35,
       "changeS": null,
       "reported": true
     },
@@ -117,9 +117,9 @@
       "label": "Gartenpartei (*)",
       "euro": "*",
       "votes": 0.6,
-      "share": 0.6,
+      "share": 0.57,
       "seats": null,
-      "changeV": -0.21,
+      "changeV": -0.24,
       "changeS": null,
       "reported": true
     },
@@ -129,9 +129,9 @@
       "label": "PARTEI (NI)",
       "euro": "NI",
       "votes": 0.3,
-      "share": 0.3,
+      "share": 0.27,
       "seats": null,
-      "changeV": -0.43,
+      "changeV": -0.46,
       "changeS": null,
       "reported": true
     },
@@ -141,9 +141,9 @@
       "label": "Tierschutzallianz (*)",
       "euro": "*",
       "votes": 0.6,
-      "share": 0.6,
+      "share": 0.55,
       "seats": null,
-      "changeV": 0.12,
+      "changeV": 0.07,
       "changeS": null,
       "reported": true
     },
@@ -153,9 +153,9 @@
       "label": "BSW (NI)",
       "euro": "NI",
       "votes": 5.3,
-      "share": 5.29,
+      "share": 5.27,
       "seats": null,
-      "changeV": 5.29,
+      "changeV": 5.27,
       "changeS": null,
       "reported": true
     },
@@ -165,9 +165,9 @@
       "label": "PdF (RE)",
       "euro": "RE",
       "votes": 0.2,
-      "share": 0.2,
+      "share": 0.21,
       "seats": null,
-      "changeV": 0.2,
+      "changeV": 0.21,
       "changeS": null,
       "reported": true
     },
@@ -177,9 +177,9 @@
       "label": "Volt (Greens/EFA)",
       "euro": "Greens/EFA",
       "votes": 0.3,
-      "share": 0.3,
+      "share": 0.33,
       "seats": null,
-      "changeV": 0.3,
+      "changeV": 0.33,
       "changeS": null,
       "reported": true
     }
