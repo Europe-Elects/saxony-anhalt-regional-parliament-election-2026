@@ -149,33 +149,6 @@
 <body>
 <div class="wrap">
 
-  <div class="callout">
-    <span class="label">Projections</span>
-  </div>
-  <div class="card">
-    <h3>Infratest dimap &amp; Forschungsgruppe Wahlen · voting intention over time</h3>
-    <div class="sub">Every full-breakdown poll from these two institutes published since the 2021 election, popular vote and projected seats</div>
-    <div class="embed-row">
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · popular vote</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-n6ZSl" src="https://datawrapper.dwcdn.net/n6ZSl/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · seats</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (seats)" aria-label="Line chart" id="datawrapper-chart-Kc3lD" src="https://datawrapper.dwcdn.net/Kc3lD/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · popular vote</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-EsjOj" src="https://datawrapper.dwcdn.net/EsjOj/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-      <div class="card">
-        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · seats</div>
-        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (seats)" aria-label="Line chart" id="datawrapper-chart-W2k84" src="https://datawrapper.dwcdn.net/W2k84/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
-      </div>
-    </div>
-    <p class="threshold-note">Both institutes publish their first projection at about 18:20 CEST on 6 September 2026 and revise it through the evening as counting proceeds. These charts stay empty until then.</p>
-  </div>
-
   <div class="callout title">
     <span class="label">Quick facts</span>
   </div>
@@ -213,6 +186,44 @@
     </div>
   </details>
 
+  <!-- RESULTS -->
+  <div id="results" class="callout">
+    <span class="label">Results</span>
+  </div>
+  <div class="card">
+    <h3>All contesting parties</h3>
+    <div class="sub">All 15 parties approved for the 6 September 2026 ballot, with their European party affiliation. Official second-vote results and the +/- change vs. 2021 will populate after polls close.</div>
+    <div class="updated dataStatus"></div>
+    <table id="resultsTable"></table>
+  </div>
+
+  <div class="callout">
+    <span class="label">Projections</span>
+  </div>
+  <div class="card">
+    <h3>Infratest dimap &amp; Forschungsgruppe Wahlen · voting intention over time</h3>
+    <div class="sub">Every full-breakdown poll from these two institutes published since the 2021 election, popular vote and projected seats</div>
+    <div class="embed-row">
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · popular vote</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-n6ZSl" src="https://datawrapper.dwcdn.net/n6ZSl/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Infratest dimap · seats</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: Infratest dimap projections (seats)" aria-label="Line chart" id="datawrapper-chart-Kc3lD" src="https://datawrapper.dwcdn.net/Kc3lD/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · popular vote</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (popular vote)" aria-label="Line chart" id="datawrapper-chart-EsjOj" src="https://datawrapper.dwcdn.net/EsjOj/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+      <div class="card">
+        <div class="sub" style="margin-bottom:8px;font-weight:700;color:var(--text);">Forschungsgruppe Wahlen · seats</div>
+        <div class="iframe-embed"><iframe title="Saxony-Anhalt regional parliament election 2026: FGW projections (seats)" aria-label="Line chart" id="datawrapper-chart-W2k84" src="https://datawrapper.dwcdn.net/W2k84/1/" scrolling="no" frameborder="0" height="397" data-external="1"></iframe></div>
+      </div>
+    </div>
+    <p class="threshold-note">Both institutes publish their first projection at about 18:20 CEST on 6 September 2026 and revise it through the evening as counting proceeds. These charts stay empty until then.</p>
+  </div>
+
   <div class="callout">
     <span class="label">Exit Poll · Popular Vote</span>
   </div>
@@ -243,17 +254,6 @@
     <div id="turnoutWrap" class="iframe-embed">
       <iframe title="Saxony-Anhalt regional parliament election 2026: Turnout" aria-label="Line chart" id="datawrapper-chart-YC0Gm" src="https://datawrapper.dwcdn.net/YC0Gm/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="391" data-external="1"></iframe>
     </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results" class="callout">
-    <span class="label">Results</span>
-  </div>
-  <div class="card">
-    <h3>All contesting parties</h3>
-    <div class="sub">All 15 parties approved for the 6 September 2026 ballot, with their European party affiliation. Official second-vote results and the +/- change vs. 2021 will populate after polls close.</div>
-    <div class="updated dataStatus"></div>
-    <table id="resultsTable"></table>
   </div>
 
   <!-- 2021 RESULT -->
@@ -1002,13 +1002,18 @@ async function renderExitSeats(){
 
 /* ---------- RESULTS: all 15 contesting parties ---------- */
 const contestants = [
-  {k:'CDU', last:'37.1%'}, {k:'AfD', last:'20.8%'}, {k:'LINKE', last:'11.0%'},
-  {k:'SPD', last:'8.4%'}, {k:'FDP', last:'6.4%'}, {k:'GRUENE', last:'5.9%'},
-  {k:'FW', last:'3.1%'}, {k:'BASIS', last:'1.5%'}, {k:'TSP', last:'1.4%'}, {k:'GARTEN', last:'0.8%'},
-  {k:'PARTEI', last:'0.7%'}, {k:'TSA', last:'0.5%'}, {k:'BSW', last:'–'},
+  {k:'CDU', last:'37.10%'}, {k:'AfD', last:'20.80%'}, {k:'LINKE', last:'11.00%'},
+  {k:'SPD', last:'8.40%'}, {k:'FDP', last:'6.40%'}, {k:'GRUENE', last:'5.90%'},
+  {k:'FW', last:'3.10%'}, {k:'BASIS', last:'1.50%'}, {k:'TSP', last:'1.40%'}, {k:'GARTEN', last:'0.80%'},
+  {k:'PARTEI', last:'0.70%'}, {k:'TSA', last:'0.50%'}, {k:'BSW', last:'–'},
   {k:'PDF', last:'—'}, {k:'VOLT', last:'—'},
 ];
 const PENDING = '<td style="color:var(--muted)">pending</td>';
+
+/* Two-decimal formatters, used only in the Results table below — every other
+   chart/list on the page keeps the rounded-to-one-decimal fmt()/fmtPP(). */
+function fmt2(n){ return n.toFixed(2)+'%'; }
+function fmtPP2(n){ return (n>=0?'+':'') + n.toFixed(2) + 'pp'; }
 
 /* Change columns come from the sheet's formulas — the 2021 baseline lives
    there, not here. */
@@ -1020,8 +1025,8 @@ function resultsTableHTML(live){
     const m = PARTIES[c.k];
     const r = live && live[c.k];
     const cells = r
-      ? `<td>${fmt(r.share)}${r.seats!=null?`<small style="color:var(--muted)"> · ${r.seats} seats</small>`:''}</td>
-         <td style="color:${r.changeV>0?'var(--green)':r.changeV<0?'var(--red)':'inherit'}">${r.changeV!=null?fmtPP(r.changeV):'—'}</td>`
+      ? `<td>${fmt2(r.share)}${r.seats!=null?`<small style="color:var(--muted)"> · ${r.seats} seats</small>`:''}</td>
+         <td style="color:${r.changeV>0?'var(--green)':r.changeV<0?'var(--red)':'inherit'}">${r.changeV!=null?fmtPP2(r.changeV):'—'}</td>`
       : PENDING + PENDING;
     return `<tr>
       <td style="font-weight:700;color:${m.color==='#FFD700'?'#a68a00':m.color}"><span class="swatch" style="background:${m.color}"></span>&nbsp;${esc(m.name)}</td>
